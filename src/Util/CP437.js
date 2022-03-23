@@ -46,7 +46,7 @@ export default {
                 let char = str.charAt(i);
                 throw new Error(`Cannot encode character '${char}' at '${str.substring(0, i).slice(-16)}[${char}]${str.substring(i + 1, i + 17)}'`);
             }
-            result[i] = index ?? 63;
+            result[i] = index;
         }
         return result;
     },
