@@ -1,5 +1,6 @@
 import ArchiveIndex from "../../Index/ArchiveIndex.js";
 import ArchiveEntry from "./ArchiveEntry.js";
+import BigInt from "../../Util/BigInt";
 
 export default class EntryIterator {
     /** @type {ReadArchive} */ archive;
@@ -29,7 +30,7 @@ export default class EntryIterator {
             this.archiveIndex = new ArchiveIndex();
         }
         this.reader.seek(this.startOffset);
-        this.currentEntry = 0n;
+        this.currentEntry = BigInt(0);
     }
 
     /**

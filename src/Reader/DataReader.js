@@ -1,3 +1,4 @@
+import BigInt from "../Util/BigInt";
 
 export default class DataReader {
     /** @type {TextDecoder} */ textDecoder = new TextDecoder();
@@ -134,7 +135,7 @@ export default class DataReader {
      * @returns {Promise<bigint>}
      */
     async getBigUint64At(offset, littleEndian = true) {
-        return (await (this.readDVAt(offset, 8, false))).getBigUint64(0, littleEndian);
+        return this.getBigUint64FromDataView(await this.readDVAt(offset, 8, false), 0, littleEndian);
     }
 
     /**
@@ -308,6 +309,23 @@ export default class DataReader {
     setMaxBufferSize(size) {
         this.bufferSize = size;
         return this;
+    }
+
+    /**
+     * @param {DataView} dataView
+     * @param {number} byteOffset
+     * @param {boolean} littleEndian
+     * @return {number|BigInt|bigint}
+     * @protected
+     */
+    getBigUint64FromDataView(dataView, byteOffset, littleEndian) {
+        if(DataView.prototype.getBigUint64) {
+            return dataView.getBigUint64(byteOffset, littleEndian);
+        }
+        const [h, l] = littleEndian ? [4, 0] : [0, 4];
+        const wh = BigInt(dataView.getUint32(byteOffset + h, littleEndian));
+        const wl = BigInt(dataView.getUint32(byteOffset + l, littleEndian));
+        return (wh << BigInt(32)) + wl;
     }
 
     /**

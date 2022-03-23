@@ -1,6 +1,7 @@
 import EntrySource from "./EntrySource.js";
 import constants from "../../constants.js";
 import CRC32 from "../../Util/CRC32.js";
+import BigInt from "../../Util/BigInt";
 
 export default class DataReaderEntrySource extends EntrySource {
     /** @type {DataReader} */ reader;

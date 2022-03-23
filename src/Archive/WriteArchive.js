@@ -3,6 +3,7 @@ import constants from "../constants.js";
 import EndOfCentralDirectoryLocator64 from "./Structure/EndOfCentralDirectoryLocator64.js";
 import EndOfCentralDirectoryRecord from "./Structure/EndOfCentralDirectoryRecord.js";
 import WriteArchiveOptions from "../Options/WriteArchiveOptions.js";
+import BigInt from "../Util/BigInt";
 
 export default class WriteArchive {
     /** @type {WriteArchiveOptions} */ options;

@@ -7,6 +7,7 @@ import LocalFileHeader from "../Structure/LocalFileHeader.js";
 import EntryDataReader from "./EntryDataReader.js";
 import MsDosTime from "../../Util/MsDosTime.js";
 import EntryOptions from "../../Options/EntryOptions.js";
+import BigInt from "../../Util/BigInt";
 
 export default class ArchiveEntry {
     /** @type {CentralDirectoryFileHeader} */ centralDirectoryFileHeader;

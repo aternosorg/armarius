@@ -1,5 +1,6 @@
 import SignatureStructure from "./SignatureStructure.js";
 import constants from "../../constants.js";
+import BigInt from "../../Util/BigInt";
 
 /**
  * Zip64 end of central directory record
@@ -88,7 +89,7 @@ export default class EndOfCentralDirectoryRecord64 extends SignatureStructure {
         this.centralDirectoryEntries = await reader.getBigUint64();
         this.centralDirectorySize = await reader.getBigUint64();
         this.centralDirectoryOffset = await reader.getBigUint64();
-        this.extensibleDataSector = await reader.read(Number(this.centralDirectoryEndSize - 44n));
+        this.extensibleDataSector = await reader.read(Number(this.centralDirectoryEndSize - BigInt(44)));
     }
 
     /**
