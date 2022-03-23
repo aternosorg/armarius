@@ -32,7 +32,4 @@ export default {
 
     MIN_VERSION_DEFLATE: 20,
     MIN_VERSION_ZIP64: 45,
-
-    MS_DOS_MAX_DATE: new Date(2107, 11, 31),
-    MS_DOS_MIN_DATE: new Date(1980, 0, 1)
 };
