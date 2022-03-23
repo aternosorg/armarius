@@ -193,10 +193,10 @@ export default class FileHeader extends SignatureStructure {
 
     /**
      * @param {number} flag
-     * @returns {number}
+     * @returns {boolean}
      */
     getFlag(flag) {
-        return this.bitFlag & flag === flag;
+        return (this.bitFlag & flag) === flag;
     }
 }
 
