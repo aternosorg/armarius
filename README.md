@@ -121,13 +121,13 @@ while (chunk = await reader.read(1024 * 64)) {
 Note that the `length` parameter passed to `EntryDataReader.read` is the length of the compressed data read from the
 file. Since this data is decompressed, the size of the returned chunk might differ.
 
-Also note that an empty chunk returned `EntryDataReader.read` does not necessarily indicate that all data has been read.
+Also note that an empty chunk returned from `EntryDataReader.read` does not necessarily indicate that all data has been read.
 After all data was read, null will be returned instead.
 
 ### Writing archives
 
 New archives can be created using a [WriteArchive](src/Archive/WriteArchive.js) object.
-The [WriteArchive](src/Archive/WriteArchive.js) constructor needs to be passed a function that generate
+The [WriteArchive](src/Archive/WriteArchive.js) constructor needs to be passed a function that generates
 new [EntrySource](src/Archive/EntrySource/EntrySource.js) objects when needed.
 
 Additionally, a [WriteArchiveOptions](src/Options/WriteArchiveOptions.js) object can be passed:
@@ -184,11 +184,11 @@ properties:
 | `forceUTF8FileName`      | boolean                           | Always encode the filename and file comment in UTF-8, even if it could be encoded in CP437                                                                                                                                                                                                                                               |
 | `compressionMethod`      | number                            | Compression method that should be used for this entry. By default, this library only supports `0` (Store) and `8` (Deflate). More compression methods can be added using the `dataProcessors` option.<br/><br/>When using an [ArchiveEntryEntrySource](src/Archive/EntrySource/ArchiveEntryEntrySource.js), this option will be ignored. |
 | `forceZIP64`             | boolean                           | Whether ZIP64 structures should always be created, even if not required by the content.                                                                                                                                                                                                                                                  |
-| `minMadeByVersion`       | number                            | The minimum `madeByVersion` value to be used for this entry. If a higher version is required (e.g. because ZIP64 is used, it will be set automatically and this option will be ignored.                                                                                                                                                  |
-| `minExtractionVersion`   | number                            | The minimum `extractionVersion` value to be used for this entry. If a higher version is required (e.g. because ZIP64 is used, it will be set automatically and this option will be ignored.                                                                                                                                              |
+| `minMadeByVersion`       | number                            | The minimum `madeByVersion` value to be used for this entry. If a higher version is required (e.g. because ZIP64) is used, it will be set automatically and this option will be ignored.                                                                                                                                                 |
+| `minExtractionVersion`   | number                            | The minimum `extractionVersion` value to be used for this entry. If a higher version is required (e.g. because ZIP64) is used, it will be set automatically and this option will be ignored.                                                                                                                                             |
 | `modTime`                | Date                              | Last modified time of the entry                                                                                                                                                                                                                                                                                                          |
-| `acTime`                 | Date                              | Last access time of the entry. This option id ignored if `extendedTimeStampField` is `false`.                                                                                                                                                                                                                                            |
-| `crTime`                 | Date                              | File creation time of the entry. This option id ignored if `extendedTimeStampField` is `false`.                                                                                                                                                                                                                                          |
+| `acTime`                 | Date                              | Last access time of the entry. This option is ignored if `extendedTimeStampField` is `false`.                                                                                                                                                                                                                                            |
+| `crTime`                 | Date                              | File creation time of the entry. This option is ignored if `extendedTimeStampField` is `false`.                                                                                                                                                                                                                                          |
 | `unicodeFileNameField`   | boolean                           | Whether a Unicode Path Extra Field should be added                                                                                                                                                                                                                                                                                       |
 | `unicodeCommentField`    | boolean                           | Whether a Unicode Comment Extra Field should be added                                                                                                                                                                                                                                                                                    |
 | `extendedTimeStampField` | boolean                           | Whether an Extended Timestamp Extra Field should be added                                                                                                                                                                                                                                                                                |
@@ -218,7 +218,7 @@ let merger = new armarius.ArchiveMerger(archives, options);
 let outputWriteArchive = merger.getOutputArchive();
 
 let chunk;
-while (chunk = await writeArchive.getNextChunk()) {
+while (chunk = await outputWriteArchive.getNextChunk()) {
     console.log('New archive chunk:', chunk);
 }
 ```
@@ -235,7 +235,7 @@ a [MergeOptions](src/Archive/Merge/MergeSource.js) object with the following pro
 
 #### MergeSource objects
 
-A [MergeSource](src/Archive/Merge/MergeSource.js) objects allows greater control over how an Archive is merged into the
+A [MergeSource](src/Archive/Merge/MergeSource.js) object allows greater control over how a source archive is merged into the
 destination archive.
 
 ```javascript
@@ -258,6 +258,6 @@ Armarius is open source software released under the MIT license, see [license](L
 
 ### Contributing
 
-If you want to contribute you need to [fork](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo)
-the repository, then add your changes to your fork and then create
+You can contribute to this project by [forking](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo)
+the repository, adding your changes to your fork, and creating
 a [pull request](https://github.com/aternosorg/armarius/compare).
