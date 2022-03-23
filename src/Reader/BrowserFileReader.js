@@ -135,7 +135,7 @@ export default class BrowserFileReader extends DataReader {
      */
     async getBigUint64At(offset, littleEndian = true) {
         if (this.buffer && offset > this.bufferStartOffset && offset - this.bufferStartOffset + 8 < this.buffer.byteLength) {
-            return this.bufferView.getBigUint64(offset - this.bufferStartOffset, littleEndian);
+            return this.getBigUint64FromDataView(this.bufferView, offset - this.bufferStartOffset, littleEndian);
         }
         return super.getBigUint64At(offset, littleEndian);
     }

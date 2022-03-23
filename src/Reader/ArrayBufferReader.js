@@ -69,7 +69,7 @@ export default class ArrayBufferReader extends DataReader {
      * @inheritDoc
      */
     async getBigUint64At(offset, littleEndian = true) {
-        return this.view.getBigUint64(offset, littleEndian);
+        return this.getBigUint64FromDataView(this.view, offset, littleEndian);
     }
 }
 

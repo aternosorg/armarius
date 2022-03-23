@@ -54,25 +54,8 @@ export default class DataReader {
      * @param {number} offset
      * @returns {Promise<number>}
      */
-    async getInt8At(offset) {
-        return (await (this.readDVAt(offset, 1, false))).getInt8(0);
-    }
-
-    /**
-     * @param {number} offset
-     * @returns {Promise<number>}
-     */
     async getUint8At(offset) {
         return (await (this.readDVAt(offset, 1, false))).getUint8(0);
-    }
-
-    /**
-     * @param {number} offset
-     * @param {boolean} littleEndian
-     * @returns {Promise<number>}
-     */
-    async getInt16At(offset, littleEndian = true) {
-        return (await (this.readDVAt(offset, 2, false))).getInt16(0, littleEndian);
     }
 
     /**
@@ -89,44 +72,8 @@ export default class DataReader {
      * @param {boolean} littleEndian
      * @returns {Promise<number>}
      */
-    async getInt32At(offset, littleEndian = true) {
-        return (await (this.readDVAt(offset, 4, false))).getInt32(0, littleEndian);
-    }
-
-    /**
-     * @param {number} offset
-     * @param {boolean} littleEndian
-     * @returns {Promise<number>}
-     */
     async getUint32At(offset, littleEndian = true) {
         return (await (this.readDVAt(offset, 4, false))).getUint32(0, littleEndian);
-    }
-
-    /**
-     * @param {number} offset
-     * @param {boolean} littleEndian
-     * @returns {Promise<number>}
-     */
-    async getFloat32At(offset, littleEndian = true) {
-        return (await (this.readDVAt(offset, 4, false))).getFloat32(0, littleEndian);
-    }
-
-    /**
-     * @param {number} offset
-     * @param {boolean} littleEndian
-     * @returns {Promise<number>}
-     */
-    async getFloat64At(offset, littleEndian = true) {
-        return (await (this.readDVAt(offset, 8, false))).getFloat64(0, littleEndian);
-    }
-
-    /**
-     * @param {number} offset
-     * @param {boolean} littleEndian
-     * @returns {Promise<bigint>}
-     */
-    async getBigInt64At(offset, littleEndian = true) {
-        return (await (this.readDVAt(offset, 8, false))).getBigInt64(0, littleEndian);
     }
 
     /**
@@ -139,48 +86,11 @@ export default class DataReader {
     }
 
     /**
-     * @param {number} offset
-     * @param {boolean} littleEndian
-     * @returns {Promise<number>}
-     */
-    async getInt64At(offset, littleEndian = true) {
-        return Number(await this.getBigInt64At(offset, littleEndian));
-    }
-
-    /**
-     * @param {number} offset
-     * @param {boolean} littleEndian
-     * @returns {Promise<number>}
-     */
-    async getUint64At(offset, littleEndian = true) {
-        return Number(await this.getBigUint64At(offset, littleEndian));
-    }
-
-    /**
-     * @returns {Promise<number>}
-     */
-    async getInt8() {
-        let value = await this.getInt8At(this.offset);
-        this.offset += 1;
-        return value;
-    }
-
-    /**
      * @returns {Promise<number>}
      */
     async getUint8() {
         let value = await this.getUint8At(this.offset);
         this.offset += 1;
-        return value;
-    }
-
-    /**
-     * @param {boolean} littleEndian
-     * @returns {Promise<number>}
-     */
-    async getInt16(littleEndian = true) {
-        let value = await this.getInt16At(this.offset, littleEndian);
-        this.offset += 2;
         return value;
     }
 
@@ -198,49 +108,9 @@ export default class DataReader {
      * @param {boolean} littleEndian
      * @returns {Promise<number>}
      */
-    async getInt32(littleEndian = true) {
-        let value = await this.getInt32At(this.offset, littleEndian);
-        this.offset += 4;
-        return value;
-    }
-
-    /**
-     * @param {boolean} littleEndian
-     * @returns {Promise<number>}
-     */
     async getUint32(littleEndian = true) {
         let value = await this.getUint32At(this.offset, littleEndian);
         this.offset += 4;
-        return value;
-    }
-
-    /**
-     * @param {boolean} littleEndian
-     * @returns {Promise<number>}
-     */
-    async getFloat32(littleEndian = true) {
-        let value = await this.getFloat32At(this.offset, littleEndian);
-        this.offset += 4;
-        return value;
-    }
-
-    /**
-     * @param {boolean} littleEndian
-     * @returns {Promise<number>}
-     */
-    async getFloat64(littleEndian = true) {
-        let value = await this.getFloat64At(this.offset, littleEndian);
-        this.offset += 8;
-        return value;
-    }
-
-    /**
-     * @param {boolean} littleEndian
-     * @returns {Promise<bigint>}
-     */
-    async getBigInt64(littleEndian = true) {
-        let value = await this.getBigInt64At(this.offset, littleEndian);
-        this.offset += 8;
         return value;
     }
 
@@ -251,45 +121,6 @@ export default class DataReader {
     async getBigUint64(littleEndian = true) {
         let value = await this.getBigUint64At(this.offset, littleEndian);
         this.offset += 8;
-        return value;
-    }
-
-    /**
-     * @param {boolean} littleEndian
-     * @returns {Promise<number>}
-     */
-    async getInt64(littleEndian = true) {
-        let value = await this.getInt64At(this.offset, littleEndian);
-        this.offset += 8;
-        return value;
-    }
-
-    /**
-     * @param {boolean} littleEndian
-     * @returns {Promise<number>}
-     */
-    async getUint64(littleEndian = true) {
-        let value = await this.getUint64At(this.offset, littleEndian);
-        this.offset += 8;
-        return value;
-    }
-
-    /**
-     * @param {number} offset
-     * @param {number} length
-     * @returns {Promise<string>}
-     */
-    async getStringAt(offset, length) {
-        return this.textDecoder.decode(await this.readAt(offset, length));
-    }
-
-    /**
-     * @param {number} length
-     * @returns {Promise<string>}
-     */
-    async getString(length) {
-        let value = await this.getStringAt(this.offset, length);
-        this.offset += length;
         return value;
     }
 
