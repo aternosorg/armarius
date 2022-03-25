@@ -242,5 +242,37 @@ export default class WriteArchive {
         locator.disks = 1;
         return locator;
     }
-}
 
+    /**
+     * Get the offset of the start of the central directory
+     * Returns null if the first central directory chunk has not been generated yet
+     * @return {?number}
+     */
+    getCentralDirectoryOffset() {
+        return this.centralDirOffset;
+    }
+
+    /**
+     * Get the length of the central directory in bytes
+     * Returns null if the first central directory chunk has not been generated yet
+     * @return {null|number}
+     */
+    getCentralDirectoryByteLength() {
+        if(this.centralDirOffset === null) {
+            return null;
+        }
+        return this.centralDirSize;
+    }
+
+    /**
+     * Get the number of entries in the central directory
+     * Returns null if the first central directory chunk has not been generated yet
+     * @return {null|number}
+     */
+    getCentralDirectoryEntryCount() {
+        if(this.centralDirOffset === null) {
+            return null;
+        }
+        return this.centralDirEntryCount;
+    }
+}
