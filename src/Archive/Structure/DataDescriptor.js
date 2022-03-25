@@ -1,6 +1,6 @@
 import SignatureStructure from "./SignatureStructure.js";
 import constants from "../../constants.js";
-import BigInt from "../../Util/BigInt";
+import BigInt from "../../Util/BigInt.js";
 
 export default class DataDescriptor extends SignatureStructure {
     /**

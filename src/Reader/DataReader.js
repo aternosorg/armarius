@@ -1,4 +1,4 @@
-import BigInt from "../Util/BigInt";
+import BigInt from "../Util/BigInt.js";
 
 export default class DataReader {
     /** @type {TextDecoder} */ textDecoder = new TextDecoder();

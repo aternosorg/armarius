@@ -7,7 +7,7 @@ import ArchiveIndex from "../Index/ArchiveIndex.js";
 import EntryReference from "./Entry/EntryReference.js";
 import EntryIterator from "./Entry/EntryIterator.js";
 import ReadArchiveOptions from "../Options/ReadArchiveOptions.js";
-import BigInt from "../Util/BigInt";
+import BigInt from "../Util/BigInt.js";
 
 export default class ReadArchive {
     /** @type {DataReader} */ reader;

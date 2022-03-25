@@ -1,6 +1,6 @@
 import ArchiveIndex from "../../Index/ArchiveIndex.js";
 import ArchiveEntry from "./ArchiveEntry.js";
-import BigInt from "../../Util/BigInt";
+import BigInt from "../../Util/BigInt.js";
 
 export default class EntryIterator {
     /** @type {ReadArchive} */ archive;

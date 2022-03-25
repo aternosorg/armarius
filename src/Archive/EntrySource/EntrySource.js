@@ -9,7 +9,7 @@ import DataDescriptor64 from "../Structure/DataDescriptor64.js";
 import DataDescriptor from "../Structure/DataDescriptor.js";
 import UnicodeExtraField from "../Structure/ExtraField/UnicodeExtraField.js";
 import MsDosTime from "../../Util/MsDosTime.js";
-import BigInt from "../../Util/BigInt";
+import BigInt from "../../Util/BigInt.js";
 
 /**
  * @abstract
