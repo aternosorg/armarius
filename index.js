@@ -50,3 +50,5 @@ export { default as Options } from "./src/Options/Options.js";
 export { default as EntrySourceOptions } from "./src/Options/EntrySourceOptions.js";
 export { default as ReadArchiveOptions } from "./src/Options/ReadArchiveOptions.js";
 export { default as WriteArchiveOptions } from "./src/Options/WriteArchiveOptions.js";
+
+export { default as constants } from "./src/constants.js";
