@@ -95,7 +95,7 @@ export default class ArchiveEntry {
      */
     getFileNameString() {
         if (!this.fileNameString) {
-            this.fileNameString = this.decodeString(this.getFileNameData());
+            this.fileNameString = this.decodeString(this.getFileNameData(), !!this.unicodeFileName?.isValid());
         }
         return this.fileNameString;
     }
@@ -105,18 +105,19 @@ export default class ArchiveEntry {
      */
     getFileCommentString() {
         if (!this.fileCommentString) {
-            this.fileCommentString = this.decodeString(this.getFileCommentData());
+            this.fileCommentString = this.decodeString(this.getFileCommentData(), !!this.unicodeFileComment?.isValid());
         }
         return this.fileCommentString;
     }
 
     /**
      * @param {Uint8Array} data
+     * @param {boolean} forceUTF8
      * @protected
      * @returns {string}
      */
-    decodeString(data) {
-        if (this.centralDirectoryFileHeader.getFlag(constants.BITFLAG_LANG_ENCODING)) {
+    decodeString(data, forceUTF8 = false) {
+        if (forceUTF8 || this.centralDirectoryFileHeader.getFlag(constants.BITFLAG_LANG_ENCODING)) {
             return (new TextDecoder()).decode(data);
         } else {
             return CP437.decode(data);
