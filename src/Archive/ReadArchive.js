@@ -1,4 +1,4 @@
-import constants from "../constants.js";
+import Constants from "../Constants.js";
 import EndOfCentralDirectoryRecord from "./Structure/EndOfCentralDirectoryRecord.js";
 import EndOfCentralDirectoryLocator64 from "./Structure/EndOfCentralDirectoryLocator64.js";
 import EndOfCentralDirectoryRecord64 from "./Structure/EndOfCentralDirectoryRecord64.js";
@@ -39,7 +39,7 @@ export default class ReadArchive {
      * @returns {Promise<void>}
      */
     async init() {
-        if (this.reader.byteLength < constants.LENGTH_END_OF_CENTRAL_DIR) {
+        if (this.reader.byteLength < Constants.LENGTH_END_OF_CENTRAL_DIR) {
             throw new Error('Total file length is shorter than end of central directory record');
         }
 
@@ -60,9 +60,9 @@ export default class ReadArchive {
         centralDirectoryOffset, centralDirectorySize, or centralDirectoryEntries being at their max. value
         indicates a ZIP64 archive
          */
-        if (this.centralDirectoryOffset === constants.MAX_UINT32 ||
-            this.centralDirectoryByteLength === constants.MAX_UINT32 ||
-            this.centralDirectoryEntryCount === constants.MAX_UINT16) {
+        if (this.centralDirectoryOffset === Constants.MAX_UINT32 ||
+            this.centralDirectoryByteLength === Constants.MAX_UINT32 ||
+            this.centralDirectoryEntryCount === Constants.MAX_UINT16) {
 
             this.isZip64 = true;
             await this.readZip64Structures();
@@ -87,7 +87,7 @@ export default class ReadArchive {
                 possibleCentralDirectoryOffset = this.endOfCentralDirectoryOffset - this.centralDirectoryByteLength;
             }
 
-            if (await this.centralDirectoryReader.getUint32At(offset) !== constants.SIGNATURE_CENTRAL_DIR_FILE_HEADER &&
+            if (await this.centralDirectoryReader.getUint32At(offset) !== Constants.SIGNATURE_CENTRAL_DIR_FILE_HEADER &&
                 this.centralDirectoryOffset !== possibleCentralDirectoryOffset) {
                 const oldCentralDirectoryOffset = this.centralDirectoryOffset;
                 this.centralDirectoryOffset = possibleCentralDirectoryOffset;
@@ -106,12 +106,12 @@ export default class ReadArchive {
      * @returns {Promise<number>}
      */
     async findEndOfCentralDirectoryRecord() {
-        let endOfDirectoryOffset = this.reader.byteLength - constants.LENGTH_END_OF_CENTRAL_DIR;
-        if(await this.reader.getUint32At(endOfDirectoryOffset) !== constants.SIGNATURE_END_OF_CENTRAL_DIR) {
+        let endOfDirectoryOffset = this.reader.byteLength - Constants.LENGTH_END_OF_CENTRAL_DIR;
+        if(await this.reader.getUint32At(endOfDirectoryOffset) !== Constants.SIGNATURE_END_OF_CENTRAL_DIR) {
             endOfDirectoryOffset = await this.reader.lastIndexOf(
-                constants.SIGNATURE_END_OF_CENTRAL_DIR,
-                this.reader.byteLength - constants.MAX_UINT16 - constants.LENGTH_END_OF_CENTRAL_DIR,
-                this.reader.byteLength - constants.LENGTH_END_OF_CENTRAL_DIR
+                Constants.SIGNATURE_END_OF_CENTRAL_DIR,
+                this.reader.byteLength - Constants.MAX_UINT16 - Constants.LENGTH_END_OF_CENTRAL_DIR,
+                this.reader.byteLength - Constants.LENGTH_END_OF_CENTRAL_DIR
             );
             if (endOfDirectoryOffset === -1) {
                 throw new Error('Unable to find end of central directory record');
@@ -127,8 +127,8 @@ export default class ReadArchive {
      */
     async readZip64Structures() {
         const endOfDirectoryLocatorReader = await this.reader.clone(
-            this.endOfCentralDirectoryOffset - constants.LENGTH_END_OF_CENTRAL_DIR_LOCATOR_ZIP64,
-            constants.LENGTH_END_OF_CENTRAL_DIR_LOCATOR_ZIP64
+            this.endOfCentralDirectoryOffset - Constants.LENGTH_END_OF_CENTRAL_DIR_LOCATOR_ZIP64,
+            Constants.LENGTH_END_OF_CENTRAL_DIR_LOCATOR_ZIP64
         );
         this.endOfCentralDirectoryLocator64 = await EndOfCentralDirectoryLocator64.fromReader(endOfDirectoryLocatorReader);
 
@@ -137,7 +137,7 @@ export default class ReadArchive {
         }
 
         this.endOfCentralDirectoryOffset64 = Number(this.endOfCentralDirectoryLocator64.centralDirectoryEndOffset);
-        let endOfDirectoryReader = await this.reader.clone(this.endOfCentralDirectoryOffset64, constants.LENGTH_END_OF_CENTRAL_DIR_ZIP64);
+        let endOfDirectoryReader = await this.reader.clone(this.endOfCentralDirectoryOffset64, Constants.LENGTH_END_OF_CENTRAL_DIR_ZIP64);
 
         /*
          Sometimes, archive data can be prepended by some other data, which means that
@@ -147,13 +147,13 @@ export default class ReadArchive {
          so this will only work if that sector is empty.
          */
         const possibleEndOfDirectoryOffset = this.endOfCentralDirectoryOffset -
-            constants.LENGTH_END_OF_CENTRAL_DIR_LOCATOR_ZIP64 -
-            constants.LENGTH_END_OF_CENTRAL_DIR_ZIP64;
+            Constants.LENGTH_END_OF_CENTRAL_DIR_LOCATOR_ZIP64 -
+            Constants.LENGTH_END_OF_CENTRAL_DIR_ZIP64;
 
         /*
         If the offset we got from the locator is, in fact, wrong, we use our guess instead.
          */
-        if (await endOfDirectoryReader.getUint32At(0) !== constants.SIGNATURE_END_OF_CENTRAL_DIR_ZIP64 &&
+        if (await endOfDirectoryReader.getUint32At(0) !== Constants.SIGNATURE_END_OF_CENTRAL_DIR_ZIP64 &&
             this.endOfCentralDirectoryOffset64 !== possibleEndOfDirectoryOffset) {
             const oldEndOfCentralDirOffset = this.endOfCentralDirectoryOffset64;
             this.endOfCentralDirectoryOffset64 = possibleEndOfDirectoryOffset;

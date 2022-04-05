@@ -1,5 +1,5 @@
 import SignatureStructure from "./SignatureStructure.js";
-import constants from "../../constants.js";
+import Constants from "../../Constants.js";
 
 /**
  * End of central directory record
@@ -9,7 +9,7 @@ export default class EndOfCentralDirectoryRecord extends SignatureStructure {
      * End of central dir signature
      * @type {number}
      */
-    signature = constants.SIGNATURE_END_OF_CENTRAL_DIR;
+    signature = Constants.SIGNATURE_END_OF_CENTRAL_DIR;
 
     /**
      * Number of this disk
@@ -81,7 +81,7 @@ export default class EndOfCentralDirectoryRecord extends SignatureStructure {
      * @inheritDoc
      */
     async serialize() {
-        let data = new Uint8Array(constants.LENGTH_END_OF_CENTRAL_DIR + this.fileComment.byteLength);
+        let data = new Uint8Array(Constants.LENGTH_END_OF_CENTRAL_DIR + this.fileComment.byteLength);
         let view = new DataView(data.buffer, data.byteOffset, data.byteLength);
         view.setUint32(0, this.signature, true);
         view.setUint16(4, this.diskNumber, true);
@@ -99,7 +99,7 @@ export default class EndOfCentralDirectoryRecord extends SignatureStructure {
      * @inheritDoc
      */
     static getSignature() {
-        return constants.SIGNATURE_END_OF_CENTRAL_DIR;
+        return Constants.SIGNATURE_END_OF_CENTRAL_DIR;
     }
 }
 

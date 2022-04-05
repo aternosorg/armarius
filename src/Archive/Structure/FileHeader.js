@@ -1,7 +1,7 @@
 import SignatureStructure from "./SignatureStructure.js";
 import ArrayBufferReader from "../../Reader/ArrayBufferReader.js";
 import GenericExtraField from "./ExtraField/GenericExtraField.js";
-import constants from "../../constants.js";
+import Constants from "../../Constants.js";
 import Zip64ExtendedInformation from "./ExtraField/Zip64ExtendedInformation.js";
 import UnicodeExtraField from "./ExtraField/UnicodeExtraField.js";
 import ExtendedTimestamp from "./ExtraField/ExtendedTimestamp.js";
@@ -179,12 +179,12 @@ export default class FileHeader extends SignatureStructure {
      */
     async loadExtraField(type, reader) {
         switch (type) {
-            case constants.EXTRAFIELD_TYPE_ZIP64_EXTENDED_INFO:
+            case Constants.EXTRAFIELD_TYPE_ZIP64_EXTENDED_INFO:
                 return await Zip64ExtendedInformation.fromReader(reader);
-            case constants.EXTRAFIELD_TYPE_UNICODE_FILENAME:
-            case constants.EXTRAFIELD_TYPE_UNICODE_COMMENT:
+            case Constants.EXTRAFIELD_TYPE_UNICODE_FILENAME:
+            case Constants.EXTRAFIELD_TYPE_UNICODE_COMMENT:
                 return await UnicodeExtraField.fromReader(reader);
-            case constants.EXTRAFIELD_TYPE_EXTENDED_TIMESTAMP:
+            case Constants.EXTRAFIELD_TYPE_EXTENDED_TIMESTAMP:
                 return await ExtendedTimestamp.fromReader(reader);
             default:
                 return await GenericExtraField.fromReader(reader);

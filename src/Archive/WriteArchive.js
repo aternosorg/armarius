@@ -1,5 +1,5 @@
 import EndOfCentralDirectoryRecord64 from "./Structure/EndOfCentralDirectoryRecord64.js";
-import constants from "../constants.js";
+import Constants from "../Constants.js";
 import EndOfCentralDirectoryLocator64 from "./Structure/EndOfCentralDirectoryLocator64.js";
 import EndOfCentralDirectoryRecord from "./Structure/EndOfCentralDirectoryRecord.js";
 import WriteArchiveOptions from "../Options/WriteArchiveOptions.js";
@@ -17,8 +17,8 @@ export default class WriteArchive {
     /** @type {Uint8Array[]} */ centralDirHeaders = [];
     /** @type {number} */ centralDirEntryCount = 0;
     /** @type {number} */ centralDirSize = 0;
-    /** @type {number} */ madeByVersion = constants.MIN_VERSION_DEFLATE;
-    /** @type {number} */ extractionVersion = constants.MIN_VERSION_DEFLATE;
+    /** @type {number} */ madeByVersion = Constants.MIN_VERSION_DEFLATE;
+    /** @type {number} */ extractionVersion = Constants.MIN_VERSION_DEFLATE;
     /** @type {boolean} */ zip64 = false;
     /** @type {number} */ bytesWritten = 0;
 
@@ -170,9 +170,9 @@ export default class WriteArchive {
         }
 
         if (!this.endWritten) {
-            if (this.centralDirEntryCount > constants.MAX_UINT16 ||
-                this.centralDirSize > constants.MAX_UINT32 ||
-                this.centralDirOffset > constants.MAX_UINT32) {
+            if (this.centralDirEntryCount > Constants.MAX_UINT16 ||
+                this.centralDirSize > Constants.MAX_UINT32 ||
+                this.centralDirOffset > Constants.MAX_UINT32) {
                 this.zip64 = true;
             }
             let endStructures = [];
@@ -204,10 +204,10 @@ export default class WriteArchive {
         let record = new EndOfCentralDirectoryRecord();
         record.diskNumber = 0;
         record.centralDirectoryDiskNumber = 0;
-        record.diskCentralDirectoryEntries = this.zip64 ? constants.MAX_UINT32 : this.centralDirEntryCount;
-        record.centralDirectoryEntries = this.zip64 ? constants.MAX_UINT32 : this.centralDirEntryCount;
-        record.centralDirectorySize = this.zip64 ? constants.MAX_UINT32 : this.centralDirSize;
-        record.centralDirectoryOffset = this.zip64 ? constants.MAX_UINT32 : this.centralDirOffset;
+        record.diskCentralDirectoryEntries = this.zip64 ? Constants.MAX_UINT32 : this.centralDirEntryCount;
+        record.centralDirectoryEntries = this.zip64 ? Constants.MAX_UINT32 : this.centralDirEntryCount;
+        record.centralDirectorySize = this.zip64 ? Constants.MAX_UINT32 : this.centralDirSize;
+        record.centralDirectoryOffset = this.zip64 ? Constants.MAX_UINT32 : this.centralDirOffset;
         record.fileComment = new Uint8Array(0);
         return record;
     }

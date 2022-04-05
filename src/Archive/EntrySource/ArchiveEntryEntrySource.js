@@ -1,5 +1,5 @@
 import EntrySource from "./EntrySource.js";
-import constants from "../../constants.js";
+import Constants from "../../Constants.js";
 
 export default class ArchiveEntryEntrySource extends EntrySource {
     /** @type {ArchiveEntry} */ sourceEntry;
@@ -53,8 +53,8 @@ export default class ArchiveEntryEntrySource extends EntrySource {
         header.bitFlag = this.getBitFlag(this.sourceEntry.centralDirectoryFileHeader.bitFlag);
         header.compressionMethod = this.sourceEntry.centralDirectoryFileHeader.compressionMethod;
         header.crc32 = this.sourceEntry.getCrc();
-        header.compressedSize = this.isZip64() ? constants.MAX_UINT32 : Number(this.sourceEntry.getCompressedSize());
-        header.uncompressedSize = this.isZip64() ? constants.MAX_UINT32 : Number(this.sourceEntry.getUncompressedSize());
+        header.compressedSize = this.isZip64() ? Constants.MAX_UINT32 : Number(this.sourceEntry.getCompressedSize());
+        header.uncompressedSize = this.isZip64() ? Constants.MAX_UINT32 : Number(this.sourceEntry.getUncompressedSize());
         header.internalFileAttributes = this.sourceEntry.centralDirectoryFileHeader.internalFileAttributes;
         header.externalFileAttributes = this.sourceEntry.centralDirectoryFileHeader.externalFileAttributes;
 
@@ -113,16 +113,16 @@ export default class ArchiveEntryEntrySource extends EntrySource {
         await this.sourceEntry.readLocalFileHeader();
 
         this.zip64 = this.sourceEntry.zip64ExtendedInformation ||
-            this.getLocalHeaderOffset() > constants.MAX_UINT32;
+            this.getLocalHeaderOffset() > Constants.MAX_UINT32;
 
         let header = this.getBaseLocalFileHeader();
         header.bitFlag = this.getBitFlag(this.sourceEntry.localFileHeader.bitFlag);
         header.compressionMethod = this.sourceEntry.centralDirectoryFileHeader.compressionMethod;
         header.crc32 = this.sourceEntry.getCrc();
         header.compressedSize = this.isZip64() ?
-            constants.MAX_UINT32 : Number(this.sourceEntry.getCompressedSize());
+            Constants.MAX_UINT32 : Number(this.sourceEntry.getCompressedSize());
         header.uncompressedSize = this.isZip64() ?
-            constants.MAX_UINT32 : Number(this.sourceEntry.getUncompressedSize());
+            Constants.MAX_UINT32 : Number(this.sourceEntry.getUncompressedSize());
 
         this.setExtraFields(header, false);
 

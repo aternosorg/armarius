@@ -1,5 +1,5 @@
 import DataDescriptor from "./DataDescriptor.js";
-import constants from "../../constants.js";
+import Constants from "../../Constants.js";
 
 export default class DataDescriptor64 extends DataDescriptor {
     /**
@@ -16,7 +16,7 @@ export default class DataDescriptor64 extends DataDescriptor {
      * @inheritDoc
      */
     async serialize() {
-        let data = new Uint8Array(constants.LENGTH_DATA_DESCRIPTOR_ZIP64);
+        let data = new Uint8Array(Constants.LENGTH_DATA_DESCRIPTOR_ZIP64);
         let view = new DataView(data.buffer, data.byteOffset, data.byteLength);
 
         view.setUint32(0, this.signature, true);

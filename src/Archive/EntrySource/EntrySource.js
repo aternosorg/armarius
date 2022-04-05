@@ -1,4 +1,4 @@
-import constants from "../../constants.js";
+import Constants from "../../Constants.js";
 import ExtendedTimestamp from "../Structure/ExtraField/ExtendedTimestamp.js";
 import EntrySourceOptions from "../../Options/EntrySourceOptions.js";
 import CP437 from "../../Util/CP437.js";
@@ -148,7 +148,7 @@ export default class EntrySource {
         header.diskNumberStart = 0;
         header.internalFileAttributes = this.options.internalFileAttributes;
         header.externalFileAttributes = this.options.externalFileAttributes;
-        header.localHeaderOffset = this.isZip64() ? constants.MAX_UINT32 : this.getLocalHeaderOffset();
+        header.localHeaderOffset = this.isZip64() ? Constants.MAX_UINT32 : this.getLocalHeaderOffset();
         header.fileName = this.fileName;
         header.fileComment = this.fileComment ?? new Uint8Array(0);
         return header;
@@ -163,17 +163,17 @@ export default class EntrySource {
      */
     setCommonExtraFields(header, uncompressedSize, compressedSize, centralDir = false) {
         if (this.isZip64()) {
-            header.setExtraField(constants.EXTRAFIELD_TYPE_ZIP64_EXTENDED_INFO, this.getZip64Field(uncompressedSize, compressedSize));
+            header.setExtraField(Constants.EXTRAFIELD_TYPE_ZIP64_EXTENDED_INFO, this.getZip64Field(uncompressedSize, compressedSize));
         }
         if (this.options.extendedTimeStampField) {
-            header.setExtraField(constants.EXTRAFIELD_TYPE_EXTENDED_TIMESTAMP,
+            header.setExtraField(Constants.EXTRAFIELD_TYPE_EXTENDED_TIMESTAMP,
                 this.getExtendedTimeField(centralDir));
         }
         if (this.options.unicodeFileNameField) {
-            header.setExtraField(constants.EXTRAFIELD_TYPE_UNICODE_FILENAME, this.getUnicodeFileNameField());
+            header.setExtraField(Constants.EXTRAFIELD_TYPE_UNICODE_FILENAME, this.getUnicodeFileNameField());
         }
         if (this.options.unicodeCommentField) {
-            header.setExtraField(constants.EXTRAFIELD_TYPE_UNICODE_COMMENT, this.getUnicodeCommentField());
+            header.setExtraField(Constants.EXTRAFIELD_TYPE_UNICODE_COMMENT, this.getUnicodeCommentField());
         }
     }
 
@@ -261,15 +261,15 @@ export default class EntrySource {
      */
     getBitFlag(base = 0) {
         if (this.utf8Strings) {
-            base |= constants.BITFLAG_LANG_ENCODING;
+            base |= Constants.BITFLAG_LANG_ENCODING;
         } else {
-            base &= ~constants.BITFLAG_LANG_ENCODING;
+            base &= ~Constants.BITFLAG_LANG_ENCODING;
         }
 
         if (this.hasDataDescriptor()) {
-            base |= constants.BITFLAG_DATA_DESCRIPTOR;
+            base |= Constants.BITFLAG_DATA_DESCRIPTOR;
         } else {
-            base &= ~constants.BITFLAG_DATA_DESCRIPTOR;
+            base &= ~Constants.BITFLAG_DATA_DESCRIPTOR;
         }
         return base;
     }

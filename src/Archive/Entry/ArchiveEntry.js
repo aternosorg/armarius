@@ -1,4 +1,4 @@
-import constants from "../../constants.js";
+import Constants from "../../Constants.js";
 import CP437 from "../../Util/CP437.js";
 import CentralDirectoryFileHeader from "../Structure/CentralDirectoryFileHeader.js";
 import EntryReference from "./EntryReference.js";
@@ -51,10 +51,10 @@ export default class ArchiveEntry {
     async readCentralDirectoryHeader(reader, centralDirectoryOffset) {
         this.centralDirectoryOffset = centralDirectoryOffset;
         this.centralDirectoryFileHeader = await CentralDirectoryFileHeader.fromReader(reader);
-        this.zip64ExtendedInformation = this.centralDirectoryFileHeader.getExtraField(constants.EXTRAFIELD_TYPE_ZIP64_EXTENDED_INFO);
-        this.unicodeFileName = this.centralDirectoryFileHeader.getExtraField(constants.EXTRAFIELD_TYPE_UNICODE_FILENAME);
-        this.unicodeFileComment = this.centralDirectoryFileHeader.getExtraField(constants.EXTRAFIELD_TYPE_UNICODE_COMMENT);
-        this.extendedTimestamp = this.centralDirectoryFileHeader.getExtraField(constants.EXTRAFIELD_TYPE_EXTENDED_TIMESTAMP);
+        this.zip64ExtendedInformation = this.centralDirectoryFileHeader.getExtraField(Constants.EXTRAFIELD_TYPE_ZIP64_EXTENDED_INFO);
+        this.unicodeFileName = this.centralDirectoryFileHeader.getExtraField(Constants.EXTRAFIELD_TYPE_UNICODE_FILENAME);
+        this.unicodeFileComment = this.centralDirectoryFileHeader.getExtraField(Constants.EXTRAFIELD_TYPE_UNICODE_COMMENT);
+        this.extendedTimestamp = this.centralDirectoryFileHeader.getExtraField(Constants.EXTRAFIELD_TYPE_EXTENDED_TIMESTAMP);
     }
 
     /**
@@ -117,7 +117,7 @@ export default class ArchiveEntry {
      * @returns {string}
      */
     decodeString(data, forceUTF8 = false) {
-        if (forceUTF8 || this.centralDirectoryFileHeader.getFlag(constants.BITFLAG_LANG_ENCODING)) {
+        if (forceUTF8 || this.centralDirectoryFileHeader.getFlag(Constants.BITFLAG_LANG_ENCODING)) {
             return (new TextDecoder()).decode(data);
         } else {
             return CP437.decode(data);
@@ -177,7 +177,7 @@ export default class ArchiveEntry {
      * @returns {boolean}
      */
     isDirectory() {
-        return ((this.centralDirectoryFileHeader.bitFlag & 0xff) & constants.BITFLAG_MSDOS_DIR) === constants.BITFLAG_MSDOS_DIR ||
+        return ((this.centralDirectoryFileHeader.bitFlag & 0xff) & Constants.BITFLAG_MSDOS_DIR) === Constants.BITFLAG_MSDOS_DIR ||
             this.getFileNameString().endsWith('/');
     }
 

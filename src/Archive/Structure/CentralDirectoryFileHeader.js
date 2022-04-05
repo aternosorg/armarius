@@ -1,12 +1,12 @@
 import FileHeader from "./FileHeader.js";
-import constants from "../../constants.js";
+import Constants from "../../Constants.js";
 
 export default class CentralDirectoryFileHeader extends FileHeader {
     /**
      * Central file header signature
      * @type {number}
      */
-    signature = constants.SIGNATURE_CENTRAL_DIR_FILE_HEADER;
+    signature = Constants.SIGNATURE_CENTRAL_DIR_FILE_HEADER;
 
     /**
      * Version made by
@@ -87,7 +87,7 @@ export default class CentralDirectoryFileHeader extends FileHeader {
      */
     async serialize() {
         await this.serializeExtraFields();
-        let data = new Uint8Array(constants.LENGTH_CENTRAL_DIR_FILE_HEADER +
+        let data = new Uint8Array(Constants.LENGTH_CENTRAL_DIR_FILE_HEADER +
             this.fileName.byteLength + this.extraField.byteLength + this.fileComment.byteLength);
         let view = new DataView(data.buffer, data.byteOffset, data.byteLength);
 
@@ -109,7 +109,7 @@ export default class CentralDirectoryFileHeader extends FileHeader {
         view.setUint32(38, this.externalFileAttributes, true);
         view.setUint32(42, this.localHeaderOffset, true);
 
-        let offset = constants.LENGTH_CENTRAL_DIR_FILE_HEADER;
+        let offset = Constants.LENGTH_CENTRAL_DIR_FILE_HEADER;
         data.set(this.fileName, offset);
         offset += this.fileName.byteLength;
         data.set(this.extraField, offset);
@@ -123,7 +123,7 @@ export default class CentralDirectoryFileHeader extends FileHeader {
      * @inheritDoc
      */
     static getSignature() {
-        return constants.SIGNATURE_CENTRAL_DIR_FILE_HEADER;
+        return Constants.SIGNATURE_CENTRAL_DIR_FILE_HEADER;
     }
 }
 

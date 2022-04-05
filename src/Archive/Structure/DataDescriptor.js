@@ -1,5 +1,5 @@
 import SignatureStructure from "./SignatureStructure.js";
-import constants from "../../constants.js";
+import Constants from "../../Constants.js";
 import BigInt from "../../Util/BigInt.js";
 
 export default class DataDescriptor extends SignatureStructure {
@@ -7,7 +7,7 @@ export default class DataDescriptor extends SignatureStructure {
      * Data descriptor signature
      * @type {number}
      */
-    signature = constants.SIGNATURE_DATA_DESCRIPTOR;
+    signature = Constants.SIGNATURE_DATA_DESCRIPTOR;
 
     /**
      * CRC-32
@@ -41,7 +41,7 @@ export default class DataDescriptor extends SignatureStructure {
      * @inheritDoc
      */
     async serialize() {
-        let data = new Uint8Array(constants.LENGTH_DATA_DESCRIPTOR);
+        let data = new Uint8Array(Constants.LENGTH_DATA_DESCRIPTOR);
         let view = new DataView(data.buffer, data.byteOffset, data.byteLength);
 
         view.setUint32(0, this.signature, true);
@@ -56,7 +56,7 @@ export default class DataDescriptor extends SignatureStructure {
      * @inheritDoc
      */
     static getSignature() {
-        return constants.SIGNATURE_DATA_DESCRIPTOR;
+        return Constants.SIGNATURE_DATA_DESCRIPTOR;
     }
 }
 

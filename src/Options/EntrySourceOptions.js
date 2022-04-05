@@ -1,11 +1,11 @@
 import Options from "./Options.js";
-import constants from "../constants.js";
+import Constants from "../Constants.js";
 import PassThroughDataProcessor from "../DataProcessor/PassThroughDataProcessor.js";
 import DeflateDataProcessor from "../DataProcessor/DeflateDataProcessor.js";
 
 const defaultDataProcessors = new Map();
-defaultDataProcessors.set(constants.COMPRESSION_METHOD_STORE, PassThroughDataProcessor);
-defaultDataProcessors.set(constants.COMPRESSION_METHOD_DEFLATE, DeflateDataProcessor);
+defaultDataProcessors.set(Constants.COMPRESSION_METHOD_STORE, PassThroughDataProcessor);
+defaultDataProcessors.set(Constants.COMPRESSION_METHOD_DEFLATE, DeflateDataProcessor);
 
 /**
  * @typedef {Object} EntrySourceOptionsObject
@@ -30,10 +30,10 @@ defaultDataProcessors.set(constants.COMPRESSION_METHOD_DEFLATE, DeflateDataProce
 
 export default class EntrySourceOptions extends Options {
     /** @type {boolean} */ forceUTF8FileName = false;
-    /** @type {number} */ compressionMethod = constants.COMPRESSION_METHOD_DEFLATE;
+    /** @type {number} */ compressionMethod = Constants.COMPRESSION_METHOD_DEFLATE;
     /** @type {boolean} */ forceZIP64 = false;
-    /** @type {number} */ minMadeByVersion = constants.MIN_VERSION_DEFLATE;
-    /** @type {number} */ minExtractionVersion = constants.MIN_VERSION_DEFLATE;
+    /** @type {number} */ minMadeByVersion = Constants.MIN_VERSION_DEFLATE;
+    /** @type {number} */ minExtractionVersion = Constants.MIN_VERSION_DEFLATE;
     /** @type {?Date} */ modTime = new Date();
     /** @type {?Date} */ acTime = new Date();
     /** @type {?Date} */ crTime = new Date();

@@ -1,5 +1,5 @@
 import SignatureStructure from "./SignatureStructure.js";
-import constants from "../../constants.js";
+import Constants from "../../Constants.js";
 import BigInt from "../../Util/BigInt.js";
 
 /**
@@ -10,7 +10,7 @@ export default class EndOfCentralDirectoryRecord64 extends SignatureStructure {
      * Zip64 end of central dir signature
      * @type {number}
      */
-    signature = constants.SIGNATURE_END_OF_CENTRAL_DIR_ZIP64;
+    signature = Constants.SIGNATURE_END_OF_CENTRAL_DIR_ZIP64;
 
     /**
      * Size of zip64 end of central directory record (not including signature and this field)
@@ -96,12 +96,12 @@ export default class EndOfCentralDirectoryRecord64 extends SignatureStructure {
      * @inheritDoc
      */
     async serialize() {
-        let data = new Uint8Array(constants.LENGTH_END_OF_CENTRAL_DIR_ZIP64 + this.extensibleDataSector.byteLength);
+        let data = new Uint8Array(Constants.LENGTH_END_OF_CENTRAL_DIR_ZIP64 + this.extensibleDataSector.byteLength);
         let view = new DataView(data.buffer, data.byteOffset, data.byteLength);
         view.setUint32(0, this.signature, true);
         view.setBigUint64(
             4,
-            BigInt(constants.LENGTH_END_OF_CENTRAL_DIR_ZIP64 + this.extensibleDataSector.byteLength - 12),
+            BigInt(Constants.LENGTH_END_OF_CENTRAL_DIR_ZIP64 + this.extensibleDataSector.byteLength - 12),
             true
         );
         view.setUint16(12, this.madeByVersion, true);
@@ -120,7 +120,7 @@ export default class EndOfCentralDirectoryRecord64 extends SignatureStructure {
      * @inheritDoc
      */
     static getSignature() {
-        return constants.SIGNATURE_END_OF_CENTRAL_DIR_ZIP64;
+        return Constants.SIGNATURE_END_OF_CENTRAL_DIR_ZIP64;
     }
 }
 

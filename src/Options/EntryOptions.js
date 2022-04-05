@@ -1,11 +1,11 @@
 import Options from "./Options.js";
-import constants from "../constants.js";
+import Constants from "../Constants.js";
 import PassThroughDataProcessor from "../DataProcessor/PassThroughDataProcessor.js";
 import InflateDataProcessor from "../DataProcessor/InflateDataProcessor.js";
 
 const defaultDataProcessors = new Map();
-defaultDataProcessors.set(constants.COMPRESSION_METHOD_STORE, PassThroughDataProcessor);
-defaultDataProcessors.set(constants.COMPRESSION_METHOD_DEFLATE, InflateDataProcessor);
+defaultDataProcessors.set(Constants.COMPRESSION_METHOD_STORE, PassThroughDataProcessor);
+defaultDataProcessors.set(Constants.COMPRESSION_METHOD_DEFLATE, InflateDataProcessor);
 
 /**
  * @typedef {Object} EntryOptionsObject
