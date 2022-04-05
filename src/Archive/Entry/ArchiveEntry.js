@@ -178,7 +178,7 @@ export default class ArchiveEntry {
      */
     isDirectory() {
         return ((this.centralDirectoryFileHeader.bitFlag & 0xff) & constants.BITFLAG_MSDOS_DIR) === constants.BITFLAG_MSDOS_DIR ||
-            this.getFileCommentString().endsWith('/');
+            this.getFileNameString().endsWith('/');
     }
 
     /**
