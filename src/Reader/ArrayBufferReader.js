@@ -39,7 +39,7 @@ export default class ArrayBufferReader extends DataReader {
             throw new Error(`Cannot read beyond end of data (trying to read ${length} bytes at ${offset}, data length is ${this.byteLength})`);
         }
         if (longLived && this.byteLength - length > 64) {
-            return this.data.slice(this.byteOffset + offset, this.byteLength + offset + length);
+            return this.data.slice(this.byteOffset + offset, this.byteOffset + offset + length);
         }
         return new Uint8Array(this.data.buffer, this.byteOffset + offset, length);
     }
