@@ -146,7 +146,7 @@ export default class WriteArchive {
             this.centralDirHeaders[0].byteLength));
 
         let offset = 0;
-        while (this.centralDirHeaders[0] && offset + this.centralDirHeaders[0].byteLength < res.byteLength) {
+        while (this.centralDirHeaders[0] && offset + this.centralDirHeaders[0].byteLength <= res.byteLength) {
             let header = this.centralDirHeaders.shift();
             res.set(header, offset);
             offset += header.byteLength;
