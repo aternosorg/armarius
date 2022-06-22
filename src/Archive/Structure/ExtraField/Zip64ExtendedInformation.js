@@ -1,21 +1,22 @@
 import ExtraField from "./ExtraField.js";
+import BigIntUtils from "../../../Util/BigIntUtils.js";
 
 export default class Zip64ExtendedInformation extends ExtraField {
     /**
      * Original uncompressed file size
-     * @type {bigint}
+     * @type {BigInt}
      */
     uncompressedSize;
 
     /**
      * Size of compressed data
-     * @type {bigint}
+     * @type {BigInt}
      */
     compressedSize;
 
     /**
      * Offset of local header record
-     * @type {bigint}
+     * @type {BigInt}
      */
     localHeaderOffset;
 
@@ -46,9 +47,9 @@ export default class Zip64ExtendedInformation extends ExtraField {
 
         view.setUint16(0, 28, true);
 
-        view.setBigUint64(2, this.uncompressedSize, true);
-        view.setBigUint64(10, this.compressedSize, true);
-        view.setBigUint64(18, this.localHeaderOffset, true);
+        BigIntUtils.setBigUint64InView(view, 2, this.uncompressedSize, true);
+        BigIntUtils.setBigUint64InView(view, 10, this.compressedSize, true);
+        BigIntUtils.setBigUint64InView(view, 18, this.localHeaderOffset, true);
         view.setUint32(26, this.diskNumberStart, true);
 
         return data;

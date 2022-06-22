@@ -1,5 +1,6 @@
 import SignatureStructure from "./SignatureStructure.js";
 import Constants from "../../Constants.js";
+import BigIntUtils from "../../Util/BigIntUtils.js";
 
 /**
  * Zip64 end of central directory locator
@@ -19,7 +20,7 @@ export default class EndOfCentralDirectoryLocator64 extends SignatureStructure {
 
     /**
      * Relative offset of the zip64 end of central directory record
-     * @type {bigint}
+     * @type {BigInt}
      */
     centralDirectoryEndOffset;
 
@@ -47,7 +48,7 @@ export default class EndOfCentralDirectoryLocator64 extends SignatureStructure {
         let view = new DataView(data.buffer, data.byteOffset, data.byteLength);
         view.setUint32(0, this.signature, true);
         view.setUint32(4, this.centralDirectoryEndDiskNumber, true);
-        view.setBigUint64(8, this.centralDirectoryEndOffset, true);
+        BigIntUtils.setBigUint64InView(view, 8, this.centralDirectoryEndOffset, true);
         view.setUint32(16, this.disks, true);
         return data;
     }

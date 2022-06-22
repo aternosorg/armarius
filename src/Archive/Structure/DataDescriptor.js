@@ -17,13 +17,13 @@ export default class DataDescriptor extends SignatureStructure {
 
     /**
      * Compressed size
-     * @type {bigint}
+     * @type {BigInt}
      */
     compressedSize;
 
     /**
      * Uncompressed size
-     * @type {bigint}
+     * @type {BigInt}
      */
     uncompressedSize;
 

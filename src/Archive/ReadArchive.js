@@ -310,7 +310,7 @@ export default class ReadArchive {
 
     /**
      * Total number of entries in the central directory on this disk
-     * @returns {bigint}
+     * @returns {BigInt}
      */
     getDiskCentralDirectoryEntryCount() {
         return BigInt(this.endOfCentralDirectoryRecord64?.diskCentralDirectoryEntries ??
@@ -319,7 +319,7 @@ export default class ReadArchive {
 
     /**
      * Total number of entries in the central directory
-     * @returns {bigint}
+     * @returns {BigInt}
      */
     getCentralDirectoryEntryCount() {
         return BigInt(this.endOfCentralDirectoryRecord64?.centralDirectoryEntries ??
@@ -328,7 +328,7 @@ export default class ReadArchive {
 
     /**
      * Size of the central directory
-     * @returns {bigint}
+     * @returns {BigInt}
      */
     getCentralDirectorySize() {
         return BigInt(this.endOfCentralDirectoryRecord64?.centralDirectorySize ??
@@ -337,7 +337,7 @@ export default class ReadArchive {
 
     /**
      * Offset of start of central directory with respect to the starting disk number
-     * @returns {bigint}
+     * @returns {BigInt}
      */
     getCentralDirectoryOffset() {
         return BigInt(this.endOfCentralDirectoryRecord64?.centralDirectoryOffset ??

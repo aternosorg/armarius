@@ -1,6 +1,7 @@
 import SignatureStructure from "./SignatureStructure.js";
 import Constants from "../../Constants.js";
 import BigInt from "../../Util/BigInt.js";
+import BigIntUtils from "../../Util/BigIntUtils.js";
 
 /**
  * Zip64 end of central directory record
@@ -17,7 +18,7 @@ export default class EndOfCentralDirectoryRecord64 extends SignatureStructure {
      *
      * This value is ignored in serialization.
      * Instead, the correct value is calculated.
-     * @type {bigint}
+     * @type {BigInt}
      */
     centralDirectoryEndSize;
 
@@ -47,25 +48,25 @@ export default class EndOfCentralDirectoryRecord64 extends SignatureStructure {
 
     /**
      * Total number of entries in the central directory on this disk
-     * @type {bigint}
+     * @type {BigInt}
      */
     diskCentralDirectoryEntries;
 
     /**
      * Total number of entries in the central directory
-     * @type {bigint}
+     * @type {BigInt}
      */
     centralDirectoryEntries;
 
     /**
      * Size of the central directory
-     * @type {bigint}
+     * @type {BigInt}
      */
     centralDirectorySize;
 
     /**
      * Offset of start of central directory with respect to the starting disk number
-     * @type {bigint}
+     * @type {BigInt}
      */
     centralDirectoryOffset;
 
@@ -99,7 +100,8 @@ export default class EndOfCentralDirectoryRecord64 extends SignatureStructure {
         let data = new Uint8Array(Constants.LENGTH_END_OF_CENTRAL_DIR_ZIP64 + this.extensibleDataSector.byteLength);
         let view = new DataView(data.buffer, data.byteOffset, data.byteLength);
         view.setUint32(0, this.signature, true);
-        view.setBigUint64(
+        BigIntUtils.setBigUint64InView(
+            view,
             4,
             BigInt(Constants.LENGTH_END_OF_CENTRAL_DIR_ZIP64 + this.extensibleDataSector.byteLength - 12),
             true
@@ -108,10 +110,10 @@ export default class EndOfCentralDirectoryRecord64 extends SignatureStructure {
         view.setUint16(14, this.extractionVersion, true);
         view.setUint32(16, this.diskNumber, true);
         view.setUint32(20, this.centralDirectoryDiskNumber, true);
-        view.setBigUint64(24, this.diskCentralDirectoryEntries, true);
-        view.setBigUint64(32, this.centralDirectoryEntries, true);
-        view.setBigUint64(40, this.centralDirectorySize, true);
-        view.setBigUint64(48, this.centralDirectoryOffset, true);
+        BigIntUtils.setBigUint64InView(view, 24, this.diskCentralDirectoryEntries, true);
+        BigIntUtils.setBigUint64InView(view, 32, this.centralDirectoryEntries, true);
+        BigIntUtils.setBigUint64InView(view, 40, this.centralDirectorySize, true);
+        BigIntUtils.setBigUint64InView(view, 48, this.centralDirectoryOffset, true);
         data.set(this.extensibleDataSector, 56);
         return data;
     }

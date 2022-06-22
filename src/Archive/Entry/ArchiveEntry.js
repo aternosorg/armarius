@@ -137,7 +137,7 @@ export default class ArchiveEntry {
     }
 
     /**
-     * @returns {bigint}
+     * @returns {BigInt}
      */
     getLocalHeaderOffset() {
         if (this.zip64ExtendedInformation) {
@@ -147,7 +147,7 @@ export default class ArchiveEntry {
     }
 
     /**
-     * @returns {bigint}
+     * @returns {BigInt}
      */
     getCompressedSize() {
         if (this.zip64ExtendedInformation) {
@@ -157,7 +157,7 @@ export default class ArchiveEntry {
     }
 
     /**
-     * @returns {bigint}
+     * @returns {BigInt}
      */
     getUncompressedSize() {
         if (this.zip64ExtendedInformation) {

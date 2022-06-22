@@ -1,5 +1,6 @@
 import DataDescriptor from "./DataDescriptor.js";
 import Constants from "../../Constants.js";
+import BigIntUtils from "../../Util/BigIntUtils.js";
 
 export default class DataDescriptor64 extends DataDescriptor {
     /**
@@ -21,8 +22,8 @@ export default class DataDescriptor64 extends DataDescriptor {
 
         view.setUint32(0, this.signature, true);
         view.setUint32(4, this.crc32, true);
-        view.setBigUint64(8, this.compressedSize, true);
-        view.setBigUint64(16, this.uncompressedSize, true);
+        BigIntUtils.setBigUint64InView(view, 8, this.compressedSize, true);
+        BigIntUtils.setBigUint64InView(view, 16, this.uncompressedSize, true);
 
         return data;
     }

@@ -4,9 +4,9 @@ import BigInt from "../../Util/BigInt.js";
 
 export default class EntryIterator {
     /** @type {ReadArchive} */ archive;
-    /** @type {bigint} */ entryCount;
+    /** @type {BigInt} */ entryCount;
     /** @type {number} */ startOffset;
-    /** @type {bigint} */ currentEntry;
+    /** @type {BigInt} */ currentEntry;
     /** @type {DataReader} */ reader;
     /** @type {ArchiveIndex} */ archiveIndex;
     /** @type {boolean} */ createIndex = true;

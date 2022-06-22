@@ -156,8 +156,8 @@ export default class EntrySource {
 
     /**
      * @param {FileHeader} header
-     * @param {number|bigint} uncompressedSize
-     * @param {number|bigint} compressedSize
+     * @param {number|BigInt} uncompressedSize
+     * @param {number|BigInt} compressedSize
      * @param {boolean} centralDir
      * @protected
      */
@@ -178,8 +178,8 @@ export default class EntrySource {
     }
 
     /**
-     * @param {number|bigint} uncompressedSize
-     * @param {number|bigint} compressedSize
+     * @param {number|BigInt} uncompressedSize
+     * @param {number|BigInt} compressedSize
      * @protected
      * @returns {Zip64ExtendedInformation}
      */

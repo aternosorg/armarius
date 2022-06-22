@@ -1,4 +1,5 @@
 import DataReader from "./DataReader.js";
+import BigIntUtils from "../Util/BigIntUtils.js";
 
 
 export default class ArrayBufferReader extends DataReader {
@@ -69,7 +70,7 @@ export default class ArrayBufferReader extends DataReader {
      * @inheritDoc
      */
     async getBigUint64At(offset, littleEndian = true) {
-        return this.getBigUint64FromDataView(this.view, offset, littleEndian);
+        return BigIntUtils.getBigUint64FromView(this.view, offset, littleEndian);
     }
 }
 
