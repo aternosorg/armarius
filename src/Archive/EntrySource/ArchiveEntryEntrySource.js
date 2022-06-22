@@ -4,7 +4,7 @@ import Constants from "../../Constants.js";
 export default class ArchiveEntryEntrySource extends EntrySource {
     /** @type {ArchiveEntry} */ sourceEntry;
     /** @type {DataReader} */ entryDataReader;
-    /** @type {boolean} */ zip64
+    /** @type {boolean} */ zip64;
 
     /**
      * @param {ArchiveEntry} sourceEntry

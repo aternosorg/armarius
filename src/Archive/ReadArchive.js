@@ -200,7 +200,7 @@ export default class ReadArchive {
     async forEachEntry(callback) {
         let iterator = await this.getEntryIterator();
         let entry, i = 0;
-        while (entry = await iterator.next()) {
+        while ((entry = await iterator.next()) !== null) {
             await callback(entry, i);
         }
     }

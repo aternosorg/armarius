@@ -12,7 +12,7 @@ export default class ArchiveIndex {
     /** @type {Uint32Array[]} */ insertData = [];
     /** @type {?Uint32Array} */ finalizedCrcData = null;
     /** @type {?Uint32Array} */ finalizedOffsetData = null;
-    /** @type {boolean} */ finalized = false
+    /** @type {boolean} */ finalized = false;
 
     /**
      * Binary search

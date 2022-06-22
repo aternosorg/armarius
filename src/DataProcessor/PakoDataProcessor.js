@@ -17,7 +17,7 @@ export default class PakoDataProcessor extends DataProcessor {
      */
     async process(data, lastChunk = false) {
         this.pako.push(data, lastChunk);
-        return this.concatChunks()
+        return this.concatChunks();
     }
 
     /**
