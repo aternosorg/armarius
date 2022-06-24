@@ -169,7 +169,7 @@ export default class ReadArchive {
         }
 
         this.centralDirectoryByteLength = Number(this.endOfCentralDirectoryRecord64.centralDirectorySize);
-        this.centralDirectoryOffset = Number(this.endOfCentralDirectoryRecord64.centralDirectoryOffset + this.prependedDataLength);
+        this.centralDirectoryOffset = Number(this.endOfCentralDirectoryRecord64.centralDirectoryOffset) + this.prependedDataLength;
         this.centralDirectoryEntryCount = Number(this.endOfCentralDirectoryRecord64.centralDirectoryEntries);
     }
 

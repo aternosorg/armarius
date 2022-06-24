@@ -26,6 +26,7 @@ export default class DataReaderEntrySource extends EntrySource {
         this.reader = reader;
         this.dataCrc32 = new CRC32();
         this.compressor = this.getDataProcessor();
+        this.zip64 = this.options.forceZIP64;
     }
 
     /**
@@ -78,7 +79,7 @@ export default class DataReaderEntrySource extends EntrySource {
      * @inheritDoc
      */
     async generateLocalFileHeader() {
-        this.zip64 = this.reader.byteLength > Constants.MAX_UINT32 ||
+        this.zip64 = this.zip64 || this.reader.byteLength > Constants.MAX_UINT32 ||
             this.getLocalHeaderOffset() > Constants.MAX_UINT32;
         if (this.zip64) {
             this.madeByVersion = Constants.MIN_VERSION_ZIP64;

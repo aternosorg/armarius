@@ -6,7 +6,7 @@ export default class UnicodeExtraField extends ExtraField {
      * Version of this extra field, currently 1
      * @type {number}
      */
-    version;
+    version = 1;
 
     /**
      * Data CRC32 Checksum
@@ -34,12 +34,13 @@ export default class UnicodeExtraField extends ExtraField {
      * @returns {Promise<void>}
      */
     async read(reader) {
+        await super.read(reader);
         this.version = await reader.getUint8();
         if (this.version !== 1) {
             throw new Error(`Unknown unicode extra field version ${this.version}`);
         }
         this.crc32 = await reader.getUint32();
-        this.data = await reader.read(this.size - 3);
+        this.data = await reader.read(this.size - 5);
 
         this.valid = CRC32.hash(this.data) === this.crc32;
     }

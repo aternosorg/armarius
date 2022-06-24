@@ -4,4 +4,4 @@ test.js
 build/
 dist/
 docs/
-
+coverage/

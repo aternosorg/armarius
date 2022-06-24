@@ -5,10 +5,11 @@ export default class BigIntUtils {
      * @param {DataView} dataView
      * @param {number} byteOffset
      * @param {boolean} littleEndian
+     * @param {boolean} native
      * @return {number|BigInt}
      */
-    static getBigUint64FromView(dataView, byteOffset, littleEndian) {
-        if(DataView.prototype.getBigUint64) {
+    static getBigUint64FromView(dataView, byteOffset, littleEndian, native = true) {
+        if(DataView.prototype.getBigUint64 && native) {
             return dataView.getBigUint64(byteOffset, littleEndian);
         }
         const [h, l] = littleEndian ? [4, 0] : [0, 4];
@@ -22,10 +23,11 @@ export default class BigIntUtils {
      * @param {number} byteOffset
      * @param {BigInt} value
      * @param {boolean} littleEndian
+     * @param {boolean} native
      * @returns {void}
      */
-    static setBigUint64InView(dataView, byteOffset, value, littleEndian) {
-        if(DataView.prototype.setBigUint64) {
+    static setBigUint64InView(dataView, byteOffset, value, littleEndian, native = true) {
+        if(DataView.prototype.setBigUint64 && native) {
             return dataView.setBigUint64(byteOffset, value, littleEndian);
         }
         const wh = Number((value >> BigInt(32)) & BigInt(0xFFFFFFFF));

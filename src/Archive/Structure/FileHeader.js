@@ -162,7 +162,7 @@ export default class FileHeader extends SignatureStructure {
 
                 let startOffset = reader.offset;
                 let field = await this.loadExtraField(type, reader);
-                reader.seek(startOffset + field.size);
+                reader.seek(startOffset + 2 + field.size);
 
                 this.extraFields.set(type, field);
             }

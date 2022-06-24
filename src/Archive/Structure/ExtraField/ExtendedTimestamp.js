@@ -10,7 +10,7 @@ export default class ExtendedTimestamp extends ExtraField {
      * @type {boolean}
      * @protected
      */
-    centralDirMode;
+    centralDirMode = false;
 
     /**
      * @inheritDoc
