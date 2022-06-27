@@ -4,7 +4,7 @@ const timestamp = 1655914036349;
 const roundedTimestamp = 1661184436000;
 const date = new Date(timestamp);
 
-let timeValue = 37096;
+let timeValue = 33000;
 let dateValue = 21718;
 
 test('Encode date value', () => {

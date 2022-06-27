@@ -11,9 +11,9 @@ export default class MsDosTime {
     static encodeTime(date) {
         date = this.clampDate(date);
         let res = 0;
-        res |= Math.floor(date.getSeconds() / 2) & 0b11111;
-        res |= (date.getMinutes() & 0b111111) << 5;
-        res |= (date.getHours() & 0b11111) << 11;
+        res |= Math.floor(date.getUTCSeconds() / 2) & 0b11111;
+        res |= (date.getUTCMinutes() & 0b111111) << 5;
+        res |= (date.getUTCSeconds() & 0b11111) << 11;
         return res;
     }
 
@@ -26,9 +26,9 @@ export default class MsDosTime {
     static encodeDate(date) {
         date = this.clampDate(date);
         let res = 0;
-        res |= date.getDate() & 0b11111;
-        res |= ((date.getMonth() + 1) & 0b1111) << 5;
-        res |= ((date.getFullYear() - 1980) & 0b1111111) << 9;
+        res |= date.getUTCDate() & 0b11111;
+        res |= ((date.getUTCMonth() + 1) & 0b1111) << 5;
+        res |= ((date.getUTCFullYear() - 1980) & 0b1111111) << 9;
         return res;
     }
 
@@ -45,7 +45,10 @@ export default class MsDosTime {
             month = ((date >> 5) & 0b1111) + 1,
             year = (date >> 9) + 1980;
 
-        return new Date(year, month, day, hours, minutes, seconds, 0);
+        let res = new Date();
+        res.setUTCFullYear(year, month, day);
+        res.setUTCHours(hours, minutes, seconds, 0);
+        return res;
     }
 
     /**
