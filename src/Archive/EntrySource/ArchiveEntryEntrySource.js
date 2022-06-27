@@ -1,5 +1,6 @@
 import EntrySource from "./EntrySource.js";
 import Constants from "../../Constants.js";
+import GenericExtraField from '../Structure/ExtraField/GenericExtraField.js';
 
 export default class ArchiveEntryEntrySource extends EntrySource {
     /** @type {ArchiveEntry} */ sourceEntry;
@@ -73,7 +74,9 @@ export default class ArchiveEntryEntrySource extends EntrySource {
             this.sourceEntry.centralDirectoryFileHeader.getExtraFields() :
             this.sourceEntry.localFileHeader.getExtraFields();
         for (let [type, field] of extraFields) {
-            header.setExtraField(type, field);
+            if(!(field instanceof GenericExtraField)) {
+                header.setExtraField(type, field);
+            }
         }
         this.setCommonExtraFields(header, this.sourceEntry.getUncompressedSize(),
             this.sourceEntry.getCompressedSize(), centralDir);
