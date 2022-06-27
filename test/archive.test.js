@@ -1,4 +1,6 @@
 import {
+    ArchiveEntry,
+    ArchiveMerger,
     ArrayBufferReader,
     Constants,
     DataReaderEntrySource, ExtendedTimestamp,
@@ -120,4 +122,39 @@ test('Extra fields', async () => {
     expect(localTimestampField.modTime).toEqual(timestampSeconds);
     expect(localTimestampField.acTime).toEqual(timestampSeconds);
     expect(localTimestampField.crTime).toEqual(timestampSeconds);
+});
+
+test('Merge archives', async () => {
+    async function makeArchive(fileName) {
+        let i = 0;
+        let archive = new WriteArchive(() => {
+            if(i >= 1) {
+                return null;
+            }
+            i++;
+            return new DataReaderEntrySource(new ArrayBufferReader(encoder.encode(`file-content-${fileName}`).buffer), {
+                fileName: fileName,
+            });
+        });
+
+        return await writeArchiveToBuffer(archive);
+    }
+
+    let data1 = await makeArchive('file1.txt');
+    let data2 = await makeArchive('file2.txt');
+
+    let archive1 = new ReadArchive(new ArrayBufferReader(data1.buffer, data1.byteOffset, data1.byteLength));
+    let archive2 = new ReadArchive(new ArrayBufferReader(data2.buffer, data2.byteOffset, data2.byteLength));
+    await archive1.init();
+    await archive2.init();
+
+    let merger = new ArchiveMerger([archive1, archive2]);
+    let resData = await writeArchiveToBuffer(merger.outputArchive);
+
+    let archive = new ReadArchive(new ArrayBufferReader(resData.buffer, resData.byteOffset, resData.byteLength));
+    await archive.init();
+    let entries = await archive.getAllEntries();
+
+    expect(entries.find(e => e.fileNameString === 'file1.txt')).toBeInstanceOf(ArchiveEntry);
+    expect(entries.find(e => e.fileNameString === 'file2.txt')).toBeInstanceOf(ArchiveEntry);
 });
