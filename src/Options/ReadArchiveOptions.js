@@ -1,4 +1,5 @@
 import Options from "./Options.js";
+import Constants from '../Constants.js';
 
 /**
  * @typedef {Object} ReadArchiveOptionsObject
@@ -9,7 +10,7 @@ import Options from "./Options.js";
 
 
 export default class ReadArchiveOptions extends Options{
-    /** @type {number} */ centralDirectoryBufferSize = 1024 * 512;
+    /** @type {number} */ centralDirectoryBufferSize = Constants.DEFAULT_CHUNK_SIZE;
     /** @type {boolean} */ createEntryIndex = true;
     /** @type {EntryOptions|EntryOptionsObject} */ entryOptions = {};
 }

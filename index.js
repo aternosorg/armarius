@@ -41,10 +41,17 @@ export { default as CRC32 } from "./src/Util/CRC32.js";
 export { default as MsDosTime } from "./src/Util/MsDosTime.js";
 
 export { default as DataProcessor } from "./src/DataProcessor/DataProcessor.js";
-export { default as InflateDataProcessor } from "./src/DataProcessor/InflateDataProcessor.js";
+export { default as AbstractDataProcessor } from "./src/DataProcessor/AbstractDataProcessor.js";
+export { default as PakoInflateDataProcessor } from "./src/DataProcessor/PakoInflateDataProcessor.js";
 export { default as PassThroughDataProcessor } from "./src/DataProcessor/PassThroughDataProcessor.js";
-export { default as DeflateDataProcessor } from "./src/DataProcessor/DeflateDataProcessor.js";
+export { default as PakoDeflateDataProcessor } from "./src/DataProcessor/PakoDeflateDataProcessor.js";
 export { default as PakoDataProcessor } from "./src/DataProcessor/PakoDataProcessor.js";
+export { default as NativeDeflateDataProcessor } from "./src/DataProcessor/NativeDeflateDataProcessor.js";
+export { default as NativeInflateDataProcessor } from "./src/DataProcessor/NativeInflateDataProcessor.js";
+export { default as NativeStreamDataProcessor } from "./src/DataProcessor/NativeStreamDataProcessor.js";
+export { default as FallbackDataProcessor } from "./src/DataProcessor/FallbackDataProcessor.js";
+export { default as DefaultInflateDataProcessor } from "./src/DataProcessor/DefaultInflateDataProcessor.js";
+export { default as DefaultDeflateDataProcessor } from "./src/DataProcessor/DefaultDeflateDataProcessor.js";
 
 export { default as Options } from "./src/Options/Options.js";
 export { default as EntrySourceOptions } from "./src/Options/EntrySourceOptions.js";

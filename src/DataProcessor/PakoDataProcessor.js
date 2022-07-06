@@ -1,22 +1,29 @@
-import DataProcessor from "./DataProcessor.js";
+import AbstractDataProcessor from './AbstractDataProcessor.js';
 
 /**
  * @abstract
  */
-export default class PakoDataProcessor extends DataProcessor {
+export default class PakoDataProcessor extends AbstractDataProcessor {
     /** @type {Uint8Array[]} */ chunks = [];
     /** @type {Deflate|Inflate} */ pako;
 
-    constructor() {
-        super();
+    /**
+     * @inheritDoc
+     */
+    constructor(reader, createPreCrc = false, createPostCrc = false) {
+        super(reader, createPreCrc, createPostCrc);
         this.reset();
     }
 
     /**
      * @inheritDoc
      */
-    async process(data, lastChunk = false) {
-        this.pako.push(data, lastChunk);
+    async generate(length) {
+        if(this.eof) {
+            return null;
+        }
+
+        this.pako.push(await this.getChunkFromReader(length), this.eof);
         return this.concatChunks();
     }
 
@@ -65,8 +72,8 @@ export default class PakoDataProcessor extends DataProcessor {
      * @inheritDoc
      */
     reset() {
+        super.reset();
         this.chunks = [];
         this.initPako();
     }
 }
-

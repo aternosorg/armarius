@@ -1,11 +1,11 @@
 import Options from "./Options.js";
 import Constants from "../Constants.js";
 import PassThroughDataProcessor from "../DataProcessor/PassThroughDataProcessor.js";
-import DeflateDataProcessor from "../DataProcessor/DeflateDataProcessor.js";
+import DefaultDeflateDataProcessor from '../DataProcessor/DefaultDeflateDataProcessor.js';
 
 const defaultDataProcessors = new Map();
 defaultDataProcessors.set(Constants.COMPRESSION_METHOD_STORE, PassThroughDataProcessor);
-defaultDataProcessors.set(Constants.COMPRESSION_METHOD_DEFLATE, DeflateDataProcessor);
+defaultDataProcessors.set(Constants.COMPRESSION_METHOD_DEFLATE, DefaultDeflateDataProcessor);
 
 /**
  * @typedef {Object} EntrySourceOptionsObject
@@ -24,7 +24,7 @@ defaultDataProcessors.set(Constants.COMPRESSION_METHOD_DEFLATE, DeflateDataProce
  * @property {?string} [fileName]
  * @property {number} [internalFileAttributes]
  * @property {number} [externalFileAttributes]
- * @property {Map<number, function(new:DataProcessor)>} [dataProcessors]
+ * @property {Map<number, typeof DataProcessor>} [dataProcessors]
  */
 
 
@@ -44,6 +44,6 @@ export default class EntrySourceOptions extends Options {
     /** @type {?string} */ fileName = null;
     /** @type {number} */ internalFileAttributes = 0;
     /** @type {number} */ externalFileAttributes = 0;
-    /** @type {Map<number, function(new:DataProcessor)>} */ dataProcessors = defaultDataProcessors;
+    /** @type {Map<number, typeof DataProcessor>} */ dataProcessors = defaultDataProcessors;
 }
 

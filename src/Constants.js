@@ -31,4 +31,6 @@ export default class Constants {
 
     /** @type {number} */ static MIN_VERSION_DEFLATE = 20;
     /** @type {number} */ static MIN_VERSION_ZIP64 = 45;
+
+    /** @type {number} */ static DEFAULT_CHUNK_SIZE = 1024 * 512;
 }

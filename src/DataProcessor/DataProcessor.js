@@ -1,22 +1,44 @@
+
 /**
- * @abstract
+ * @interface
  */
 export default class DataProcessor {
     /**
-     * @param {Uint8Array} data
-     * @param {boolean} lastChunk
-     * @returns {Promise<Uint8Array>}
-     * @abstract
+     * @return {?CRC32}
      */
-    async process(data, lastChunk = false) {
-
+    getPreCrc() {
     }
 
     /**
+     * @return {?CRC32}
+     */
+    getPostCrc() {
+    }
+
+    /**
+     * @param {number} length
+     * @return {Promise<Uint8Array>}
+     */
+    async getChunkFromReader(length) {
+    }
+
+    /**
+     * @param {number} length
+     * @return {Promise<?Uint8Array>}
+     * @protected
      * @abstract
      */
-    reset() {
+    async generate(length) {
+    }
 
+    /**
+     * @param {number} length
+     * @return {Promise<?Uint8Array>}
+     */
+    async read(length) {
+    }
+
+    reset() {
     }
 }
 

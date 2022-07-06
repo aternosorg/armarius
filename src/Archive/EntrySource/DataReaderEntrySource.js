@@ -7,8 +7,8 @@ export default class DataReaderEntrySource extends EntrySource {
     /** @type {DataReader} */ reader;
     /** @type {DataProcessor} */ compressor;
     /** @type {boolean} */ zip64;
-    /** @type {CRC32} */ dataCrc32;
     /** @type {number} */ compressedSize = 0;
+    /** @type {boolean} */ eof = false;
 
     /**
      * @param {DataReader} reader
@@ -24,8 +24,7 @@ export default class DataReaderEntrySource extends EntrySource {
         super(options);
 
         this.reader = reader;
-        this.dataCrc32 = new CRC32();
-        this.compressor = this.getDataProcessor();
+        this.compressor = this.getDataProcessor(this.reader);
         this.zip64 = this.options.forceZIP64;
     }
 
@@ -33,7 +32,7 @@ export default class DataReaderEntrySource extends EntrySource {
      * @inheritDoc
      */
     async generateCentralDirectoryFileHeader() {
-        let crc = this.dataCrc32.finish();
+        let crc = this.compressor.getPreCrc().finish();
         let header = this.getBaseCentralDirectoryFileHeader();
         header.bitFlag = this.getBitFlag();
         header.crc32 = crc;
@@ -49,9 +48,11 @@ export default class DataReaderEntrySource extends EntrySource {
      * @inheritDoc
      */
     async generateDataChunk(length) {
-        let chunk = await this.reader.read(Math.min(length, this.reader.byteLength - this.reader.offset));
-        this.dataCrc32.add(chunk);
-        let compressed = await this.compressor.process(chunk, this.getDataEOF());
+        let compressed = await this.compressor.read(length);
+        if(compressed === null) {
+            this.eof = true;
+            return new Uint8Array(0);
+        }
         this.compressedSize += compressed.byteLength;
         return compressed;
     }
@@ -61,7 +62,7 @@ export default class DataReaderEntrySource extends EntrySource {
      */
     async generateDataDescriptor() {
         let descriptor = this.getBaseDataDescriptor();
-        descriptor.crc32 = this.dataCrc32.finish();
+        descriptor.crc32 = this.compressor.getPreCrc().finish();
         descriptor.compressedSize = BigInt(this.compressedSize);
         descriptor.uncompressedSize = BigInt(this.reader.byteLength);
 
@@ -101,7 +102,7 @@ export default class DataReaderEntrySource extends EntrySource {
      * @inheritDoc
      */
     getDataEOF() {
-        return this.reader.offset >= this.reader.byteLength;
+        return this.eof;
     }
 
     /**

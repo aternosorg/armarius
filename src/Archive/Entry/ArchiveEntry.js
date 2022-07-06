@@ -197,7 +197,7 @@ export default class ArchiveEntry {
         if(!Processor) {
             throw new Error(`Unsupported compression method ${this.centralDirectoryFileHeader.compressionMethod}`);
         }
-        return new Processor();
+        return new Processor(this.getRawDataReader(), false, true);
     }
 
     /**
@@ -217,7 +217,6 @@ export default class ArchiveEntry {
         }
         await this.readLocalFileHeader();
         return new EntryDataReader(
-            await this.getRawDataReader(),
             this.getDataProcessor(),
             this.centralDirectoryFileHeader.crc32
         );

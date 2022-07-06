@@ -65,7 +65,7 @@ export default class WriteArchive {
      * @param {number} readSize
      * @returns {Promise<?Uint8Array>}
      */
-    async getNextChunk(readSize = 1024 * 512) {
+    async getNextChunk(readSize = Constants.DEFAULT_CHUNK_SIZE) {
         let chunk = await this.generateChunk(readSize);
         if (chunk) {
             this.bytesWritten += chunk.byteLength;
@@ -78,7 +78,7 @@ export default class WriteArchive {
      * @protected
      * @returns {Promise<?Uint8Array>}
      */
-    async generateChunk(readSize = 1024 * 512) {
+    async generateChunk(readSize = Constants.DEFAULT_CHUNK_SIZE) {
         if (!this.currentEntrySource && !this.endOfArchive) {
             await this.nextEntry();
         }
@@ -131,7 +131,7 @@ export default class WriteArchive {
      * @protected
      * @returns {Uint8Array}
      */
-    getCentralDirectoryChunk(readSize = 1024 * 512) {
+    getCentralDirectoryChunk(readSize = Constants.DEFAULT_CHUNK_SIZE) {
         if(this.centralDirOffset === null) {
             this.centralDirOffset = this.bytesWritten;
         }
@@ -164,7 +164,7 @@ export default class WriteArchive {
      * @protected
      * @returns {Promise<?Uint8Array>}
      */
-    async getEndOfArchiveChunk(readSize = 1024 * 512) {
+    async getEndOfArchiveChunk(readSize = Constants.DEFAULT_CHUNK_SIZE) {
         if (!this.centralHeadersWritten) {
             return this.getCentralDirectoryChunk(readSize);
         }

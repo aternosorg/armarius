@@ -228,15 +228,17 @@ export default class EntrySource {
     }
 
     /**
+     * @param {DataReader} reader
+     * @param {number} method
      * @protected
      * @returns {DataProcessor}
      */
-    getDataProcessor(method = this.options.compressionMethod) {
+    getDataProcessor(reader, method = this.options.compressionMethod) {
         let Processor = this.options.dataProcessors.get(method);
         if(!Processor) {
             throw new Error(`Unsupported compression method ${method}`);
         }
-        return new Processor();
+        return new Processor(reader, true);
     }
 
     /**
