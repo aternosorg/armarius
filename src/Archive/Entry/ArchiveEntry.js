@@ -230,8 +230,9 @@ export default class ArchiveEntry {
         let res = new Uint8Array(Number(this.getUncompressedSize()));
         let offset = 0;
         let reader = await this.getDataReader();
-        while (!reader.eof) {
-            let chunk = await reader.read(chunkSize);
+
+        let chunk;
+        while ((chunk = await reader.read(chunkSize)) !== null) {
             res.set(chunk, offset);
             offset += chunk.byteLength;
         }
