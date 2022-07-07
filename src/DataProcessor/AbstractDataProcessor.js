@@ -68,7 +68,7 @@ export default class AbstractDataProcessor extends DataProcessor {
      */
     async read(length) {
         let chunk = await this.generate(length);
-        if(this.postCrc) {
+        if(this.postCrc && chunk !== null) {
             this.postCrc.add(chunk);
         }
 
