@@ -190,14 +190,14 @@ export default class ArchiveEntry {
 
     /**
      * @protected
-     * @returns {DataProcessor}
+     * @returns {Promise<DataProcessor>}
      */
-    getDataProcessor() {
+    async getDataProcessor() {
         let Processor = this.options.dataProcessors.get(this.centralDirectoryFileHeader.compressionMethod);
         if(!Processor) {
             throw new Error(`Unsupported compression method ${this.centralDirectoryFileHeader.compressionMethod}`);
         }
-        return new Processor(this.getRawDataReader(), false, true);
+        return new Processor(await this.getRawDataReader(), false, true);
     }
 
     /**
@@ -217,7 +217,7 @@ export default class ArchiveEntry {
         }
         await this.readLocalFileHeader();
         return new EntryDataReader(
-            this.getDataProcessor(),
+            await this.getDataProcessor(),
             this.centralDirectoryFileHeader.crc32
         );
     }
