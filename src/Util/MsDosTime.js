@@ -13,7 +13,7 @@ export default class MsDosTime {
         let res = 0;
         res |= Math.floor(date.getUTCSeconds() / 2) & 0b11111;
         res |= (date.getUTCMinutes() & 0b111111) << 5;
-        res |= (date.getUTCSeconds() & 0b11111) << 11;
+        res |= (date.getUTCHours() & 0b11111) << 11;
         return res;
     }
 

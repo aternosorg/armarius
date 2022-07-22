@@ -10,7 +10,6 @@ entries, and the ability to merge archives without decompressing and recompressi
 For deflate/inflate support, this library depends on Pako.
 
 ## Installation
-## Installation
 
 Armarius can be installed using npm:
 
