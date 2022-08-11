@@ -158,3 +158,28 @@ test('Merge archives', async () => {
     expect(entries.find(e => e.fileNameString === 'file1.txt')).toBeInstanceOf(ArchiveEntry);
     expect(entries.find(e => e.fileNameString === 'file2.txt')).toBeInstanceOf(ArchiveEntry);
 });
+
+test('Clone entry iterator', async () => {
+    let i = 0;
+    let fileName = 'file.txt';
+    let fileComment = 'file-comment';
+    let archive = new WriteArchive(() => {
+        if(i >= 2) {
+            return null;
+        }
+        i++;
+        return new DataReaderEntrySource(new ArrayBufferReader(encoder.encode(`file-content-${i}`).buffer), {
+            fileName: `file-${i}.txt`,
+        });
+    });
+    let data = await writeArchiveToBuffer(archive);
+
+    let readArchive = new ReadArchive(new ArrayBufferReader(data.buffer, data.byteOffset, data.byteLength));
+    await readArchive.init();
+
+    let entryIterator = await readArchive.getEntryIterator();
+    expect((await entryIterator.next()).getFileNameString()).toBe('file-1.txt');
+
+    let clone = await entryIterator.clone();
+    expect((await entryIterator.next()).getFileNameString()).toBe((await clone.next()).getFileNameString());
+});

@@ -34,6 +34,15 @@ export default class EntryIterator {
     }
 
     /**
+     * @return {Promise<EntryIterator>}
+     */
+    async clone() {
+        let cloneReader = await this.reader.clone();
+        cloneReader.seek(this.reader.offset);
+        return new this.constructor(this.archive, cloneReader, false);
+    }
+
+    /**
      * @returns {Promise<?ArchiveEntry>}
      */
     async next() {
