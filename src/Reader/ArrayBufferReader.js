@@ -26,7 +26,8 @@ export default class ArrayBufferReader extends DataReader {
         if (cloneLength === null) {
             cloneLength = this.byteLength - cloneOffset;
         }
-        return new this.constructor(this.data.buffer, this.byteOffset + cloneOffset, cloneLength);
+        return new this.constructor(this.data.buffer, this.byteOffset + cloneOffset, cloneLength)
+            .setMaxBufferSize(this.bufferSize);
     }
 
     /**

@@ -39,7 +39,11 @@ export default class EntryIterator {
     async clone() {
         let cloneReader = await this.reader.clone();
         cloneReader.seek(this.reader.offset);
-        return new this.constructor(this.archive, cloneReader, false);
+
+        let cloneIterator = new this.constructor(this.archive, cloneReader, false);
+        cloneIterator.currentEntry = this.currentEntry;
+        cloneIterator.startOffset = this.startOffset;
+        return cloneIterator;
     }
 
     /**

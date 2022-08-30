@@ -148,7 +148,8 @@ export default class BrowserFileReader extends DataReader {
         if (cloneLength === null) {
             cloneLength = this.byteLength - cloneOffset;
         }
-        return new this.constructor(this.file, this.byteOffset + cloneOffset, cloneLength);
+        return new this.constructor(this.file, this.byteOffset + cloneOffset, cloneLength)
+            .setMaxBufferSize(this.bufferSize);
     }
 }
 
