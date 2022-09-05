@@ -1,6 +1,6 @@
 import FallbackDataProcessor from './FallbackDataProcessor.js';
 import NativeDeflateDataProcessor from './NativeDeflateDataProcessor.js';
-import PakoDeflateDataProcessor from './PakoDeflateDataProcessor.js';
+import FflateDeflateDataProcessor from './FflateDeflateDataProcessor.js';
 
 export default class DefaultDeflateDataProcessor extends FallbackDataProcessor {
     /**
@@ -9,7 +9,7 @@ export default class DefaultDeflateDataProcessor extends FallbackDataProcessor {
     static getDataProcessors() {
         return [
             NativeDeflateDataProcessor,
-            PakoDeflateDataProcessor
+            FflateDeflateDataProcessor
         ];
     }
 }

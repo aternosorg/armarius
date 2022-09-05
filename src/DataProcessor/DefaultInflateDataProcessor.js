@@ -1,6 +1,6 @@
 import FallbackDataProcessor from './FallbackDataProcessor.js';
 import NativeInflateDataProcessor from './NativeInflateDataProcessor.js';
-import PakoInflateDataProcessor from './PakoInflateDataProcessor.js';
+import FflateInflateDataProcessor from './FflateInflateDataProcessor.js';
 
 export default class DefaultInflateDataProcessor extends FallbackDataProcessor {
     /**
@@ -9,7 +9,7 @@ export default class DefaultInflateDataProcessor extends FallbackDataProcessor {
     static getDataProcessors() {
         return [
             NativeInflateDataProcessor,
-            PakoInflateDataProcessor
+            FflateInflateDataProcessor
         ];
     }
 }

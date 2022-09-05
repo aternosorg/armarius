@@ -1,6 +1,6 @@
 {
   "name": "armarius",
-  "version": "1.5.2",
+  "version": "1.6.0",
   "description": "A JavaScript library to read, write, and merge ZIP archives in web browsers.",
   "repository": "github:aternosorg/armarius",
   "type": "module",
@@ -14,7 +14,7 @@
   "author": "Kurt Thiemann <kurt@aternos.org>",
   "license": "MIT",
   "dependencies": {
-    "pako": "^2.0.4"
+    "fflate": "^0.7.3"
   },
   "devDependencies": {
     "eslint": "^8.18.0",

@@ -3,9 +3,9 @@ import AbstractDataProcessor from './AbstractDataProcessor.js';
 /**
  * @abstract
  */
-export default class PakoDataProcessor extends AbstractDataProcessor {
+export default class FflateDataProcessor extends AbstractDataProcessor {
     /** @type {Uint8Array[]} */ chunks = [];
-    /** @type {Deflate|Inflate} */ pako;
+    /** @type {import("fflate").Deflate|import("fflate").Inflate} */ flate;
 
     /**
      * @inheritDoc
@@ -23,7 +23,7 @@ export default class PakoDataProcessor extends AbstractDataProcessor {
             return null;
         }
 
-        this.pako.push(await this.getChunkFromReader(length), this.eof);
+        this.flate.push(await this.getChunkFromReader(length), this.eof);
         return this.concatChunks();
     }
 
@@ -56,15 +56,16 @@ export default class PakoDataProcessor extends AbstractDataProcessor {
      * @protected
      * @abstract
      */
-    initPako() {
+    initFflate() {
 
     }
 
     /**
      * @protected
      * @param {Uint8Array} chunk
+     * @param {boolean} final
      */
-    onData(chunk) {
+    onData(chunk, final) {
         this.chunks.push(chunk);
     }
 
@@ -74,6 +75,6 @@ export default class PakoDataProcessor extends AbstractDataProcessor {
     reset() {
         super.reset();
         this.chunks = [];
-        this.initPako();
+        this.initFflate();
     }
 }

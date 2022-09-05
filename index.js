@@ -42,10 +42,10 @@ export { default as MsDosTime } from "./src/Util/MsDosTime.js";
 
 export { default as DataProcessor } from "./src/DataProcessor/DataProcessor.js";
 export { default as AbstractDataProcessor } from "./src/DataProcessor/AbstractDataProcessor.js";
-export { default as PakoInflateDataProcessor } from "./src/DataProcessor/PakoInflateDataProcessor.js";
+export { default as PakoInflateDataProcessor } from "./src/DataProcessor/FflateInflateDataProcessor.js";
 export { default as PassThroughDataProcessor } from "./src/DataProcessor/PassThroughDataProcessor.js";
-export { default as PakoDeflateDataProcessor } from "./src/DataProcessor/PakoDeflateDataProcessor.js";
-export { default as PakoDataProcessor } from "./src/DataProcessor/PakoDataProcessor.js";
+export { default as PakoDeflateDataProcessor } from "./src/DataProcessor/FflateDeflateDataProcessor.js";
+export { default as PakoDataProcessor } from "./src/DataProcessor/FflateDataProcessor.js";
 export { default as NativeDeflateDataProcessor } from "./src/DataProcessor/NativeDeflateDataProcessor.js";
 export { default as NativeInflateDataProcessor } from "./src/DataProcessor/NativeInflateDataProcessor.js";
 export { default as NativeStreamDataProcessor } from "./src/DataProcessor/NativeStreamDataProcessor.js";

@@ -7,7 +7,7 @@ Armarius is a JavaScript library to read, write, and merge ZIP archives in web b
 This library mainly focuses on a low memory footprint, especially when reading archives with tens of thousands of
 entries, and the ability to merge archives without decompressing and recompressing all entries.
 
-For deflate/inflate support, this library depends on Pako.
+For deflate/inflate support, this library depends on the [Compression Streams API](https://developer.mozilla.org/en-US/docs/Web/API/Compression_Streams_API) (if available) or [fflate](https://github.com/101arrowz/fflate).
 
 ## Installation
 
