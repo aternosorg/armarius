@@ -60,4 +60,11 @@ export default class FallbackDataProcessor extends DataProcessor {
     getPostCrc() {
         return this.dataProcessor.getPostCrc();
     }
+
+    /**
+     * @inheritDoc
+     */
+    reset() {
+        this.dataProcessor.reset();
+    }
 }
