@@ -4,6 +4,13 @@
  */
 export default class DataProcessor {
     /**
+     * @return {boolean}
+     * @abstract
+     */
+    static isSupported() {
+    }
+
+    /**
      * @return {?CRC32}
      */
     getPreCrc() {

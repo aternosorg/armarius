@@ -19,6 +19,9 @@ export default class FallbackDataProcessor extends DataProcessor {
 
         let lastError;
         for(let Processor of this.constructor.getDataProcessors()) {
+            if (!Processor.isSupported()) {
+                continue;
+            }
             try {
                 this.dataProcessor = new Processor(reader, createPreCrc, createPostCrc);
             }catch (e) {

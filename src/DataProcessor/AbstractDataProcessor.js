@@ -11,6 +11,13 @@ export default class AbstractDataProcessor extends DataProcessor {
     /** @type {?CRC32} */ postCrc = null;
 
     /**
+     * @inheritDoc
+     */
+    static isSupported() {
+        return true;
+    }
+
+    /**
      * @param {DataReader} reader
      * @param {boolean} createPreCrc
      * @param {boolean} createPostCrc
