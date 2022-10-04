@@ -2,22 +2,43 @@ import Constants from '../Constants.js';
 import AbstractDataProcessor from './AbstractDataProcessor.js';
 
 export default class NativeStreamDataProcessor extends AbstractDataProcessor {
-    /** @type {ReadableStream} */ stream;
-    /** @type {TransformStream} */ processor;
-    /** @type {ReadableStreamDefaultReader} */ streamReader;
+    /** @type {?boolean} */ static supported = null;
+    /** @type {?ReadableStream} */ stream = null;
+    /** @type {?TransformStream} */ processor = null;
+    /** @type {?ReadableStreamDefaultReader} */ streamReader = null;
+
+    /**
+     * @return {boolean}
+     */
+    static isSupported() {
+        if (this.supported === null) {
+            try {
+                // noinspection JSUnresolvedFunction
+                new CompressionStream('deflate-raw');
+            } catch (e) {
+                this.supported = false;
+                return this.supported;
+            }
+            this.supported = true;
+        }
+
+        return this.supported;
+    }
 
     /**
      * @inheritDoc
      */
     constructor(reader, createPreCrc = false, createPostCrc = false) {
         super(reader, createPreCrc, createPostCrc);
-        this.reset();
     }
 
     /**
      * @inheritDoc
      */
     async generate(length) {
+        if(this.streamReader === null) {
+            this.resetStreams();
+        }
         let {value} = await this.streamReader.read();
         return value ?? null;
     }
@@ -25,8 +46,7 @@ export default class NativeStreamDataProcessor extends AbstractDataProcessor {
     /**
      * @inheritDoc
      */
-    reset() {
-        super.reset();
+    resetStreams() {
         this.processor = this.createProcessorStream();
         this.stream = new ReadableStream({
             pull: async (controller) => {
@@ -38,6 +58,16 @@ export default class NativeStreamDataProcessor extends AbstractDataProcessor {
             }
         });
         this.streamReader = this.stream.pipeThrough(this.processor).getReader();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    reset() {
+        super.reset();
+        this.processor = null;
+        this.stream = null;
+        this.streamReader = null;
     }
 
     /**
