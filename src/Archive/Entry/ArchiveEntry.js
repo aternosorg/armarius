@@ -95,7 +95,11 @@ export default class ArchiveEntry {
      */
     getFileNameString() {
         if (!this.fileNameString) {
-            this.fileNameString = this.decodeString(this.getFileNameData(), !!this.unicodeFileName?.isValid());
+            let name = this.decodeString(this.getFileNameData(), !!this.unicodeFileName?.isValid());
+            if(name.startsWith('/')) {
+                name = name.substring(1);
+            }
+            this.fileNameString = name;
         }
         return this.fileNameString;
     }
