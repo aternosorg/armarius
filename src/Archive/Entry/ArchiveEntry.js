@@ -8,12 +8,17 @@ import EntryDataReader from "./EntryDataReader.js";
 import MsDosTime from "../../Util/MsDosTime.js";
 import EntryOptions from "../../Options/EntryOptions.js";
 import BigInt from "../../Util/BigInt.js";
+import CRC32 from '../../Util/CRC32.js';
+
+const decoder = new TextDecoder();
 
 export default class ArchiveEntry {
     /** @type {CentralDirectoryFileHeader} */ centralDirectoryFileHeader;
     /** @type {LocalFileHeader} */ localFileHeader;
     /** @type {number} */ centralDirectoryOffset;
     /** @type {?Zip64ExtendedInformation} */ zip64ExtendedInformation;
+    /** @type {?number} */ fileNameCrc = null;
+    /** @type {?number} */ fileCommentCrc = null;
     /** @type {UnicodeExtraField} */ unicodeFileName;
     /** @type {UnicodeExtraField} */ unicodeFileComment;
     /** @type {ExtendedTimestamp} */ extendedTimestamp;
@@ -71,36 +76,52 @@ export default class ArchiveEntry {
     }
 
     /**
-     * @returns {Uint8Array}
+     * @return {number}
      */
-    getFileNameData() {
-        if (this.unicodeFileName?.isValid()) {
-            return this.unicodeFileName.data;
+    getFileNameCrc() {
+        if (this.fileNameCrc === null) {
+            this.fileNameCrc = CRC32.hash(this.centralDirectoryFileHeader.fileName);
         }
-        return this.centralDirectoryFileHeader.fileName;
+        return this.fileNameCrc;
     }
 
     /**
-     * @returns {Uint8Array}
+     * @return {number}
      */
-    getFileCommentData() {
-        if (this.unicodeFileComment?.isValid()) {
-            return this.unicodeFileComment.data;
+    getFileCommentCrc() {
+        if (this.fileCommentCrc === null) {
+            this.fileCommentCrc = CRC32.hash(this.centralDirectoryFileHeader.fileComment);
         }
-        return this.centralDirectoryFileHeader.fileComment;
+        return this.fileCommentCrc;
+    }
+
+    /**
+     * @return {boolean}
+     */
+    hasUTF8Strings() {
+        return this.centralDirectoryFileHeader.getFlag(Constants.BITFLAG_LANG_ENCODING);
     }
 
     /**
      * @returns {string}
      */
     getFileNameString() {
-        if (!this.fileNameString) {
-            let name = this.decodeString(this.getFileNameData(), !!this.unicodeFileName?.isValid());
-            if(name.startsWith('/')) {
-                name = name.substring(1);
-            }
-            this.fileNameString = name;
+        if(this.fileNameString === null) {
+            return this.fileNameString;
         }
+
+        let data = this.centralDirectoryFileHeader.fileName;
+        let utf8 = this.hasUTF8Strings();
+        if(this.unicodeFileName && this.unicodeFileName.crc32 === this.getFileNameCrc()) {
+            data = this.unicodeFileName.data;
+            utf8 = true;
+        }
+
+        let name = utf8 ? decoder.decode(data) : CP437.decode(data);
+        if(name.startsWith('/')) {
+            name = name.substring(1);
+        }
+        this.fileNameString = name;
         return this.fileNameString;
     }
 
@@ -108,24 +129,19 @@ export default class ArchiveEntry {
      * @returns {string}
      */
     getFileCommentString() {
-        if (!this.fileCommentString) {
-            this.fileCommentString = this.decodeString(this.getFileCommentData(), !!this.unicodeFileComment?.isValid());
+        if(this.fileCommentString === null) {
+            return this.fileCommentString;
         }
-        return this.fileCommentString;
-    }
 
-    /**
-     * @param {Uint8Array} data
-     * @param {boolean} forceUTF8
-     * @protected
-     * @returns {string}
-     */
-    decodeString(data, forceUTF8 = false) {
-        if (forceUTF8 || this.centralDirectoryFileHeader.getFlag(Constants.BITFLAG_LANG_ENCODING)) {
-            return (new TextDecoder()).decode(data);
-        } else {
-            return CP437.decode(data);
+        let data = this.centralDirectoryFileHeader.fileComment;
+        let utf8 = this.hasUTF8Strings();
+        if(this.unicodeFileComment && this.unicodeFileComment.crc32 === this.getFileCommentCrc()) {
+            data = this.unicodeFileComment.data;
+            utf8 = true;
         }
+
+        this.fileCommentString = utf8 ? decoder.decode(data) : CP437.decode(data);
+        return this.fileCommentString;
     }
 
     /**

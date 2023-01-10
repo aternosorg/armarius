@@ -41,8 +41,6 @@ export default class UnicodeExtraField extends ExtraField {
         }
         this.crc32 = await reader.getUint32();
         this.data = await reader.read(this.size - 5);
-
-        this.valid = CRC32.hash(this.data) === this.crc32;
     }
 
     /**

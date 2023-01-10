@@ -21,7 +21,7 @@ export default class ArchiveEntryEntrySource extends EntrySource {
         this.extractionVersion = Math.max(this.extractionVersion, sourceEntry.centralDirectoryFileHeader.extractionVersion);
 
         this.zip64 = !!sourceEntry.zip64ExtendedInformation;
-        this.options.unicodeFileNameField = this.options.unicodeFileNameField || !!this.sourceEntry.unicodeFileComment;
+        this.options.unicodeFileNameField = this.options.unicodeFileNameField || !!this.sourceEntry.unicodeFileName;
         this.options.unicodeCommentField = this.options.unicodeCommentField || !!this.sourceEntry.unicodeFileComment;
 
         this.modTime = sourceEntry.getLastModDate();
