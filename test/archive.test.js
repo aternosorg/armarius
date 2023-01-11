@@ -109,6 +109,8 @@ test('Extra fields', async () => {
     expect(entry.extendedTimestamp).toBeTruthy();
     expect(entry.unicodeFileComment).toBeTruthy();
     expect(entry.unicodeFileName).toBeTruthy();
+    expect(entry.unicodeFileName?.crc32).toBe(entry.getFileNameCrc());
+    expect(entry.unicodeFileComment?.crc32).toBe(entry.getFileCommentCrc());
     expect(entry.getLastModDate()).toEqual(date);
 
     let centralTimestampField = entry.extendedTimestamp;
