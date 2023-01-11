@@ -1,25 +1,30 @@
-import Constants from "../../Constants.js";
-import ExtendedTimestamp from "../Structure/ExtraField/ExtendedTimestamp.js";
-import EntrySourceOptions from "../../Options/EntrySourceOptions.js";
-import CP437 from "../../Util/CP437.js";
-import LocalFileHeader from "../Structure/LocalFileHeader.js";
-import CentralDirectoryFileHeader from "../Structure/CentralDirectoryFileHeader.js";
-import Zip64ExtendedInformation from "../Structure/ExtraField/Zip64ExtendedInformation.js";
-import DataDescriptor64 from "../Structure/DataDescriptor64.js";
-import DataDescriptor from "../Structure/DataDescriptor.js";
-import UnicodeExtraField from "../Structure/ExtraField/UnicodeExtraField.js";
-import MsDosTime from "../../Util/MsDosTime.js";
-import BigInt from "../../Util/BigInt.js";
+import Constants from '../../Constants.js';
+import ExtendedTimestamp from '../Structure/ExtraField/ExtendedTimestamp.js';
+import EntrySourceOptions from '../../Options/EntrySourceOptions.js';
+import CP437 from '../../Util/CP437.js';
+import LocalFileHeader from '../Structure/LocalFileHeader.js';
+import CentralDirectoryFileHeader from '../Structure/CentralDirectoryFileHeader.js';
+import Zip64ExtendedInformation from '../Structure/ExtraField/Zip64ExtendedInformation.js';
+import DataDescriptor64 from '../Structure/DataDescriptor64.js';
+import DataDescriptor from '../Structure/DataDescriptor.js';
+import UnicodeExtraField from '../Structure/ExtraField/UnicodeExtraField.js';
+import MsDosTime from '../../Util/MsDosTime.js';
+import BigInt from '../../Util/BigInt.js';
+import {CRC32} from '../../../index.js';
+
+const encoder = new TextEncoder();
 
 /**
  * @abstract
  */
 export default class EntrySource {
     /** @type {number} */ localHeaderOffset;
-    /** @type {?Uint8Array} */ fileName;
-    /** @type {?Uint8Array} */ fileComment;
-    /** @type {?string} */ fileNameString;
-    /** @type {?string} */ fileCommentString;
+    /** @type {?Uint8Array} */ fileNameUtf8 = null;
+    /** @type {?Uint8Array} */ fileNameCP437 = null;
+    /** @type {?Uint8Array} */ fileCommentUtf8 = null;
+    /** @type {?Uint8Array} */ fileCommentCP437 = null;
+    /** @type {?string} */ fileNameString = null;
+    /** @type {?string} */ fileCommentString = null;
     /** @type {boolean} */ utf8Strings = false;
     /** @type {number} */ madeByVersion;
     /** @type {number} */ extractionVersion;
@@ -36,7 +41,13 @@ export default class EntrySource {
 
         this.madeByVersion = this.options.minMadeByVersion;
         this.extractionVersion = this.options.minExtractionVersion;
-        this.encodeStrings(this.options.fileName, this.options.fileComment);
+
+        if (this.options.fileName !== null) {
+            this.setFileNameString(this.options.fileName);
+        }
+        if (this.options.fileComment !== null) {
+            this.setFileCommentString(this.options.fileComment);
+        }
 
         this.modTime = this.options.modTime;
         this.acTime = this.options.acTime;
@@ -44,24 +55,89 @@ export default class EntrySource {
     }
 
     /**
-     * @param {?string} fileName
-     * @param {?string} fileComment
-     * @protected
+     * @param {string} fileName
+     * @return {this}
      */
-    encodeStrings(fileName, fileComment) {
+    setFileNameString(fileName) {
         this.fileNameString = fileName;
-        this.fileCommentString = fileComment;
-        if (this.options.forceUTF8FileName ||
-            !CP437.canBeEncoded(fileName ?? '') ||
-            !CP437.canBeEncoded(fileComment ?? '')) {
-            let encoder = new TextEncoder();
+        this.fileNameUtf8 = null;
+        this.fileNameCP437 = null;
+
+        if (this.options.forceUTF8FileName || !CP437.canBeEncoded(fileName)) {
             this.utf8Strings = true;
-            this.fileName = fileName ? encoder.encode(fileName) : null;
-            this.fileComment = fileComment ? encoder.encode(fileComment) : null;
-        } else {
-            this.fileName = fileName ? CP437.encode(fileName) : null;
-            this.fileComment = fileComment ? CP437.encode(fileComment) : null;
         }
+
+        return this;
+    }
+
+    /**
+     * @param {string} fileComment
+     * @return {this}
+     */
+    setFileCommentString(fileComment) {
+        this.fileCommentString = fileComment;
+        this.fileCommentUtf8 = null;
+        this.fileCommentCP437 = null;
+
+        if (this.options.forceUTF8FileName || !CP437.canBeEncoded(fileComment)) {
+            this.utf8Strings = true;
+        }
+
+        return this;
+    }
+
+    /**
+     * @return {Uint8Array}
+     */
+    getFileNameUtf8() {
+        if (this.fileNameUtf8 === null) {
+            this.fileNameUtf8 = encoder.encode(this.fileNameString ?? '');
+        }
+        return this.fileNameUtf8;
+    }
+
+    /**
+     * @return {Uint8Array}
+     */
+    getFileCommentUtf8() {
+        if (this.fileCommentUtf8 === null) {
+            this.fileCommentUtf8 = encoder.encode(this.fileCommentString ?? '');
+        }
+        return this.fileCommentUtf8;
+    }
+
+    /**
+     * @return {Uint8Array}
+     */
+    getFileNameCP437() {
+        if (this.fileNameCP437 === null) {
+            this.fileNameCP437 = CP437.encode(this.fileNameString ?? '');
+        }
+        return this.fileNameCP437;
+    }
+
+    /**
+     * @return {Uint8Array}
+     */
+    getFileCommentCP437() {
+        if (this.fileCommentCP437 === null) {
+            this.fileCommentCP437 = CP437.encode(this.fileCommentString ?? '');
+        }
+        return this.fileCommentCP437;
+    }
+
+    /**
+     * @return {Uint8Array}
+     */
+    getFileName() {
+        return this.utf8Strings ? this.getFileNameUtf8() : this.getFileNameCP437();
+    }
+
+    /**
+     * @return {Uint8Array}
+     */
+    getFileComment() {
+        return this.utf8Strings ? this.getFileCommentUtf8() : this.getFileCommentCP437();
     }
 
     /**
@@ -88,8 +164,8 @@ export default class EntrySource {
         header.compressionMethod = this.options.compressionMethod;
         header.fileModDate = MsDosTime.encodeDate(this.modTime);
         header.fileModTime = MsDosTime.encodeTime(this.modTime);
-        header.fileName = this.fileName;
-        header.fileComment = this.fileComment ?? new Uint8Array(0);
+        header.fileName = this.getFileName();
+        header.fileComment = this.getFileComment();
         return header;
     }
 
@@ -149,8 +225,8 @@ export default class EntrySource {
         header.internalFileAttributes = this.options.internalFileAttributes;
         header.externalFileAttributes = this.options.externalFileAttributes;
         header.localHeaderOffset = this.isZip64() ? Constants.MAX_UINT32 : this.getLocalHeaderOffset();
-        header.fileName = this.fileName;
-        header.fileComment = this.fileComment ?? new Uint8Array(0);
+        header.fileName = this.getFileName();
+        header.fileComment = this.getFileComment();
         return header;
     }
 
@@ -198,7 +274,8 @@ export default class EntrySource {
      */
     getUnicodeFileNameField() {
         let field = new UnicodeExtraField();
-        field.data = this.utf8Strings ? this.fileName : (new TextEncoder()).encode(this.fileNameString);
+        field.data = this.getFileNameUtf8();
+        field.crc32 = CRC32.hash(this.getFileName());
         return field;
     }
 
@@ -208,7 +285,8 @@ export default class EntrySource {
      */
     getUnicodeCommentField() {
         let field = new UnicodeExtraField();
-        field.data = this.utf8Strings ? this.fileComment : (new TextEncoder()).encode(this.fileCommentString);
+        field.data = this.getFileCommentUtf8();
+        field.crc32 = CRC32.hash(this.getFileComment());
         return field;
     }
 
@@ -235,7 +313,7 @@ export default class EntrySource {
      */
     getDataProcessor(reader, method = this.options.compressionMethod) {
         let Processor = this.options.dataProcessors.get(method);
-        if(!Processor) {
+        if (!Processor) {
             throw new Error(`Unsupported compression method ${method}`);
         }
         return new Processor(reader, true);

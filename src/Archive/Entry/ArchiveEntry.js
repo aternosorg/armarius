@@ -1,13 +1,13 @@
-import Constants from "../../Constants.js";
-import CP437 from "../../Util/CP437.js";
-import CentralDirectoryFileHeader from "../Structure/CentralDirectoryFileHeader.js";
-import EntryReference from "./EntryReference.js";
-import ArchiveIndex from "../../Index/ArchiveIndex.js";
-import LocalFileHeader from "../Structure/LocalFileHeader.js";
-import EntryDataReader from "./EntryDataReader.js";
-import MsDosTime from "../../Util/MsDosTime.js";
-import EntryOptions from "../../Options/EntryOptions.js";
-import BigInt from "../../Util/BigInt.js";
+import Constants from '../../Constants.js';
+import CP437 from '../../Util/CP437.js';
+import CentralDirectoryFileHeader from '../Structure/CentralDirectoryFileHeader.js';
+import EntryReference from './EntryReference.js';
+import ArchiveIndex from '../../Index/ArchiveIndex.js';
+import LocalFileHeader from '../Structure/LocalFileHeader.js';
+import EntryDataReader from './EntryDataReader.js';
+import MsDosTime from '../../Util/MsDosTime.js';
+import EntryOptions from '../../Options/EntryOptions.js';
+import BigInt from '../../Util/BigInt.js';
 import CRC32 from '../../Util/CRC32.js';
 
 const decoder = new TextDecoder();
@@ -106,19 +106,19 @@ export default class ArchiveEntry {
      * @returns {string}
      */
     getFileNameString() {
-        if(this.fileNameString === null) {
+        if (this.fileNameString === null) {
             return this.fileNameString;
         }
 
         let data = this.centralDirectoryFileHeader.fileName;
         let utf8 = this.hasUTF8Strings();
-        if(this.unicodeFileName && this.unicodeFileName.crc32 === this.getFileNameCrc()) {
+        if (this.unicodeFileName && this.unicodeFileName.crc32 === this.getFileNameCrc()) {
             data = this.unicodeFileName.data;
             utf8 = true;
         }
 
         let name = utf8 ? decoder.decode(data) : CP437.decode(data);
-        if(name.startsWith('/')) {
+        while (name.startsWith('/')) {
             name = name.substring(1);
         }
         this.fileNameString = name;
@@ -129,13 +129,13 @@ export default class ArchiveEntry {
      * @returns {string}
      */
     getFileCommentString() {
-        if(this.fileCommentString === null) {
+        if (this.fileCommentString === null) {
             return this.fileCommentString;
         }
 
         let data = this.centralDirectoryFileHeader.fileComment;
         let utf8 = this.hasUTF8Strings();
-        if(this.unicodeFileComment && this.unicodeFileComment.crc32 === this.getFileCommentCrc()) {
+        if (this.unicodeFileComment && this.unicodeFileComment.crc32 === this.getFileCommentCrc()) {
             data = this.unicodeFileComment.data;
             utf8 = true;
         }
@@ -214,7 +214,7 @@ export default class ArchiveEntry {
      */
     async getDataProcessor() {
         let Processor = this.options.dataProcessors.get(this.centralDirectoryFileHeader.compressionMethod);
-        if(!Processor) {
+        if (!Processor) {
             throw new Error(`Unsupported compression method ${this.centralDirectoryFileHeader.compressionMethod}`);
         }
         return new Processor(await this.getRawDataReader(), false, true);

@@ -1,5 +1,4 @@
 import ExtraField from "./ExtraField.js";
-import CRC32 from "../../../Util/CRC32.js";
 
 export default class UnicodeExtraField extends ExtraField {
     /**
@@ -53,17 +52,10 @@ export default class UnicodeExtraField extends ExtraField {
         view.setUint16(0, 5 + this.data.byteLength, true);
 
         view.setUint8(2, this.version);
-        view.setUint32(3, CRC32.hash(this.data), true);
+        view.setUint32(3, this.crc32, true);
         data.set(this.data, 7);
 
         return data;
-    }
-
-    /**
-     * @returns {boolean}
-     */
-    isValid() {
-        return this.valid;
     }
 }
 

@@ -1,5 +1,5 @@
-import EntrySource from "./EntrySource.js";
-import Constants from "../../Constants.js";
+import EntrySource from './EntrySource.js';
+import Constants from '../../Constants.js';
 import GenericExtraField from '../Structure/ExtraField/GenericExtraField.js';
 
 export default class ArchiveEntryEntrySource extends EntrySource {
@@ -14,8 +14,12 @@ export default class ArchiveEntryEntrySource extends EntrySource {
     constructor(sourceEntry, options = {}) {
         super(options);
         this.sourceEntry = sourceEntry;
-        this.encodeStrings(!this.fileName ? sourceEntry.getFileNameString() : this.fileNameString,
-            !this.fileComment ? sourceEntry.getFileCommentString() : this.fileCommentString);
+        if (this.fileNameString === null) {
+            this.setFileNameString(sourceEntry.getFileNameString());
+        }
+        if (this.fileCommentString === null) {
+            this.setFileCommentString(sourceEntry.getFileCommentString());
+        }
 
         this.madeByVersion = Math.max(this.madeByVersion, sourceEntry.centralDirectoryFileHeader.madeByVersion);
         this.extractionVersion = Math.max(this.extractionVersion, sourceEntry.centralDirectoryFileHeader.extractionVersion);
@@ -74,7 +78,7 @@ export default class ArchiveEntryEntrySource extends EntrySource {
             this.sourceEntry.centralDirectoryFileHeader.getExtraFields() :
             this.sourceEntry.localFileHeader.getExtraFields();
         for (let [type, field] of extraFields) {
-            if(!(field instanceof GenericExtraField)) {
+            if (!(field instanceof GenericExtraField)) {
                 header.setExtraField(type, field);
             }
         }
