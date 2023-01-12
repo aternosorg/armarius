@@ -8,10 +8,8 @@ export default class UnicodeExtraField extends ExtraField {
     version = 1;
 
     /**
-     * Data CRC32 Checksum
-     *
-     * This value is ignored in serialization.
-     * Instead, the correct value is calculated.
+     * CRC32 Checksum of the header field that is replaced
+     * by this extra field (file name or file comment)
      * @type {number}
      */
     crc32;
@@ -21,12 +19,6 @@ export default class UnicodeExtraField extends ExtraField {
      * @type {Uint8Array}
      */
     data;
-
-    /**
-     * @type {boolean}
-     * @protected
-     */
-    valid;
 
     /**
      * @param {DataReader} reader
