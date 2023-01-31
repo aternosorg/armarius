@@ -65,7 +65,9 @@ export default class BrowserFileReader extends DataReader {
                 let res = this.reader.result;
                 resolve(new Uint8Array(res));
             };
-            this.reader.onerror = reject;
+            this.reader.onerror = () => {
+                reject(this.reader.error || new Error('An unknown error occurred while reading from Blob'));
+            };
             this.reader.readAsArrayBuffer(this.file.slice(this.byteOffset + offset, this.byteOffset + offset + length));
         });
     }
