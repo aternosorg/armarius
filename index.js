@@ -58,4 +58,10 @@ export { default as EntrySourceOptions } from "./src/Options/EntrySourceOptions.
 export { default as ReadArchiveOptions } from "./src/Options/ReadArchiveOptions.js";
 export { default as WriteArchiveOptions } from "./src/Options/WriteArchiveOptions.js";
 
+export { default as ArmariusError } from "./src/Error/ArmariusError.js";
+export { default as ChecksumError } from "./src/Error/ChecksumError.js";
+export { default as FeatureError } from "./src/Error/FeatureError.js";
+export { default as OptionError } from "./src/Error/OptionError.js";
+export { default as ZipError } from "./src/Error/ZipError.js";
+
 export { default as Constants } from "./src/Constants.js";

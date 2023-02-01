@@ -1,5 +1,6 @@
 import BigInt from "../Util/BigInt.js";
 import BigIntUtils from "../Util/BigIntUtils.js";
+import ArmariusError from '../Error/ArmariusError.js';
 
 export default class DataReader {
     /** @type {TextDecoder} */ textDecoder = new TextDecoder();
@@ -15,7 +16,7 @@ export default class DataReader {
      * @abstract
      */
     async clone(cloneOffset = 0, cloneLength = null) {
-        throw new Error(`clone() is not implemented in ${this.constructor.name}.`);
+        throw new ArmariusError(`clone() is not implemented in ${this.constructor.name}.`);
     }
 
     /**
@@ -26,7 +27,7 @@ export default class DataReader {
      * @abstract
      */
     async readAt(offset, length, longLived = true) {
-        throw new Error(`readAt() is not implemented in ${this.constructor.name}.`);
+        throw new ArmariusError(`readAt() is not implemented in ${this.constructor.name}.`);
     }
 
     /**

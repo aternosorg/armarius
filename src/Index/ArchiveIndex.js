@@ -1,4 +1,5 @@
 import CRC32 from "../Util/CRC32.js";
+import ArmariusError from '../Error/ArmariusError.js';
 const encoder = new TextEncoder();
 
 /**
@@ -62,7 +63,7 @@ export default class ArchiveIndex {
      */
     getPossibleOffsetsByHash(crc) {
         if(!this.finalized) {
-            throw new Error('Index is not finalized');
+            throw new ArmariusError('Index is not finalized');
         }
         let firstIndex = this.find(crc);
         if(firstIndex === null) {

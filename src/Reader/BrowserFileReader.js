@@ -1,5 +1,6 @@
 import DataReader from "./DataReader.js";
 import BigIntUtils from "../Util/BigIntUtils.js";
+import ArmariusError from '../Error/ArmariusError.js';
 
 
 export default class BrowserFileReader extends DataReader {
@@ -21,7 +22,7 @@ export default class BrowserFileReader extends DataReader {
         this.byteLength = byteLength !== null ? byteLength : file.size - byteOffset;
         this.byteOffset = byteOffset;
         if (this.byteLength < 0 || this.file.size < this.byteOffset + this.byteLength) {
-            throw new Error('Invalid file range');
+            throw new ArmariusError('Invalid file range');
         }
     }
 
@@ -53,10 +54,10 @@ export default class BrowserFileReader extends DataReader {
                 return reject(Error('Multiple simultaneous reads are not supported'));
             }
             if (offset < 0) {
-                return reject(new Error(`Cannot read at negative offsets (got ${offset})`));
+                return reject(new ArmariusError(`Cannot read at negative offsets (got ${offset})`));
             }
             if (offset + length > this.byteLength) {
-                return reject(new Error(`Cannot read beyond end of data (trying to read ${length} bytes at ${offset}, data length is ${this.byteLength})`));
+                return reject(new ArmariusError(`Cannot read beyond end of data (trying to read ${length} bytes at ${offset}, data length is ${this.byteLength})`));
             }
             this.blocked = true;
             this.reader.onload = () => {
@@ -66,7 +67,7 @@ export default class BrowserFileReader extends DataReader {
                 resolve(new Uint8Array(res));
             };
             this.reader.onerror = () => {
-                reject(this.reader.error || new Error('An unknown error occurred while reading from Blob'));
+                reject(this.reader.error || new ArmariusError('An unknown error occurred while reading from Blob'));
             };
             this.reader.readAsArrayBuffer(this.file.slice(this.byteOffset + offset, this.byteOffset + offset + length));
         });
@@ -82,7 +83,7 @@ export default class BrowserFileReader extends DataReader {
     readFromBuffer(offset, length, longLived = false) {
         let bufferOffset = offset - this.bufferStartOffset;
         if (bufferOffset < 0 || bufferOffset + length > this.buffer.byteLength) {
-            throw new Error(`Cannot read ${length} bytes of buffer at ${bufferOffset}`);
+            throw new ArmariusError(`Cannot read ${length} bytes of buffer at ${bufferOffset}`);
         }
 
         if (longLived && this.buffer.byteLength - length > 512) {

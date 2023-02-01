@@ -1,4 +1,5 @@
 import CRC32 from "../../Util/CRC32.js";
+import ChecksumError from '../../Error/ChecksumError.js';
 
 export default class EntryDataReader {
     /** @type {DataProcessor} */ dataProcessor;
@@ -30,7 +31,7 @@ export default class EntryDataReader {
 
         if (this.dataProcessor.getPostCrc()) {
             if (eof && this.dataProcessor.getPostCrc().finish() !== this.expectedCrc32) {
-                throw new Error('CRC32 checksum does not match expected value');
+                throw new ChecksumError('CRC32 checksum does not match expected value');
             }
         }
 

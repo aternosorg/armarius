@@ -1,4 +1,5 @@
 import ExtraField from "./ExtraField.js";
+import FeatureError from '../../../Error/FeatureError.js';
 
 export default class UnicodeExtraField extends ExtraField {
     /**
@@ -28,7 +29,7 @@ export default class UnicodeExtraField extends ExtraField {
         await super.read(reader);
         this.version = await reader.getUint8();
         if (this.version !== 1) {
-            throw new Error(`Unknown unicode extra field version ${this.version}`);
+            throw new FeatureError(`Unknown unicode extra field version ${this.version}`);
         }
         this.crc32 = await reader.getUint32();
         this.data = await reader.read(this.size - 5);

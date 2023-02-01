@@ -8,6 +8,8 @@ import EntryReference from "./Entry/EntryReference.js";
 import EntryIterator from "./Entry/EntryIterator.js";
 import ReadArchiveOptions from "../Options/ReadArchiveOptions.js";
 import BigInt from "../Util/BigInt.js";
+import ZipError from '../Error/ZipError.js';
+import FeatureError from '../Error/FeatureError.js';
 
 export default class ReadArchive {
     /** @type {DataReader} */ reader;
@@ -40,7 +42,7 @@ export default class ReadArchive {
      */
     async init() {
         if (this.reader.byteLength < Constants.LENGTH_END_OF_CENTRAL_DIR) {
-            throw new Error('Total file length is shorter than end of central directory record');
+            throw new ZipError('Total file length is shorter than end of central directory record');
         }
 
         this.endOfCentralDirectoryOffset = await this.findEndOfCentralDirectoryRecord();
@@ -53,7 +55,7 @@ export default class ReadArchive {
         this.prependedDataLength = 0;
 
         if(this.endOfCentralDirectoryRecord.diskNumber !== 0 || this.endOfCentralDirectoryRecord.centralDirectoryDiskNumber !== 0) {
-            throw new Error('Multi disk archives are not supported');
+            throw new FeatureError('Multi disk archives are not supported');
         }
 
         /*
@@ -69,7 +71,7 @@ export default class ReadArchive {
         }
 
         if (this.centralDirectoryOffset < 0 || this.centralDirectoryOffset >= this.reader.byteLength) {
-            throw new Error('Invalid central directory data offset');
+            throw new ZipError('Invalid central directory data offset');
         }
 
         let offset = 0;
@@ -96,7 +98,7 @@ export default class ReadArchive {
             }
         }
         if (this.centralDirectoryOffset < 0 || this.centralDirectoryOffset >= this.reader.byteLength) {
-            throw new Error('Invalid central directory data offset');
+            throw new ZipError('Invalid central directory data offset');
         }
     }
 
@@ -114,7 +116,7 @@ export default class ReadArchive {
                 this.reader.byteLength - Constants.LENGTH_END_OF_CENTRAL_DIR
             );
             if (endOfDirectoryOffset === -1) {
-                throw new Error('Unable to find end of central directory record');
+                throw new ZipError('Unable to find end of central directory record');
             }
         }
         return endOfDirectoryOffset;
@@ -133,7 +135,7 @@ export default class ReadArchive {
         this.endOfCentralDirectoryLocator64 = await EndOfCentralDirectoryLocator64.fromReader(endOfDirectoryLocatorReader);
 
         if(this.endOfCentralDirectoryLocator64.disks > 1) {
-            throw new Error('Multi disk archives are not supported');
+            throw new FeatureError('Multi disk archives are not supported');
         }
 
         this.endOfCentralDirectoryOffset64 = Number(this.endOfCentralDirectoryLocator64.centralDirectoryEndOffset);
@@ -165,7 +167,7 @@ export default class ReadArchive {
 
         if(this.endOfCentralDirectoryRecord64.diskNumber !== 0 ||
             this.endOfCentralDirectoryRecord64.centralDirectoryDiskNumber !== 0) {
-            throw new Error('Multi disk archives are not supported');
+            throw new FeatureError('Multi disk archives are not supported');
         }
 
         this.centralDirectoryByteLength = Number(this.endOfCentralDirectoryRecord64.centralDirectorySize);

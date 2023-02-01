@@ -1,4 +1,5 @@
 import DataProcessor from './DataProcessor.js';
+import FeatureError from '../Error/FeatureError.js';
 
 export default class FallbackDataProcessor extends DataProcessor {
     /** @type {DataProcessor} */ dataProcessor;
@@ -32,7 +33,7 @@ export default class FallbackDataProcessor extends DataProcessor {
         }
 
         if(!this.dataProcessor) {
-            throw (lastError || new Error('Failed to find working DataProcessor'));
+            throw (lastError || new FeatureError('Failed to find working DataProcessor'));
         }
     }
 

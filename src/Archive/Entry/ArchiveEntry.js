@@ -9,6 +9,8 @@ import MsDosTime from '../../Util/MsDosTime.js';
 import EntryOptions from '../../Options/EntryOptions.js';
 import BigInt from '../../Util/BigInt.js';
 import CRC32 from '../../Util/CRC32.js';
+import FeatureError from '../../Error/FeatureError.js';
+import ArmariusError from '../../Error/ArmariusError.js';
 
 const decoder = new TextDecoder();
 
@@ -215,7 +217,7 @@ export default class ArchiveEntry {
     async getDataProcessor() {
         let Processor = this.options.dataProcessors.get(this.centralDirectoryFileHeader.compressionMethod);
         if (!Processor) {
-            throw new Error(`Unsupported compression method ${this.centralDirectoryFileHeader.compressionMethod}`);
+            throw new FeatureError(`Unsupported compression method ${this.centralDirectoryFileHeader.compressionMethod}`);
         }
         return new Processor(await this.getRawDataReader(), false, true);
     }
@@ -233,7 +235,7 @@ export default class ArchiveEntry {
      */
     async getDataReader() {
         if (this.isDirectory()) {
-            throw new Error(`Cannot create data reader: ${this.getFileNameString()} is a directory`);
+            throw new ArmariusError(`Cannot create data reader: ${this.getFileNameString()} is a directory`);
         }
         await this.readLocalFileHeader();
         return new EntryDataReader(

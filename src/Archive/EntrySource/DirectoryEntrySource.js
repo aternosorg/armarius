@@ -1,5 +1,6 @@
 import EntrySource from "./EntrySource.js";
 import Constants from "../../Constants.js";
+import OptionError from '../../Error/OptionError.js';
 
 export default class DirectoryEntrySource extends EntrySource {
     /** @type {boolean} */ zip64;
@@ -9,7 +10,7 @@ export default class DirectoryEntrySource extends EntrySource {
      */
     constructor(options) {
         if (!options.fileName) {
-            throw new Error('Missing required fileName option');
+            throw new OptionError('Missing required fileName option');
         }
         if (!options.fileName.endsWith('/')) {
             options.fileName += '/';

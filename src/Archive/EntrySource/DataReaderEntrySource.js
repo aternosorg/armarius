@@ -2,6 +2,7 @@ import EntrySource from "./EntrySource.js";
 import Constants from "../../Constants.js";
 import CRC32 from "../../Util/CRC32.js";
 import BigInt from "../../Util/BigInt.js";
+import OptionError from '../../Error/OptionError.js';
 
 export default class DataReaderEntrySource extends EntrySource {
     /** @type {DataReader} */ reader;
@@ -16,7 +17,7 @@ export default class DataReaderEntrySource extends EntrySource {
      */
     constructor(reader, options) {
         if (!options.fileName) {
-            throw new Error('Missing required fileName option');
+            throw new OptionError('Missing required fileName option');
         }
         if (options.fileName.endsWith('/')) {
             options.fileName = options.fileName.substring(0, options.fileName.length - 1);

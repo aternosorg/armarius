@@ -1,5 +1,6 @@
 import DataReader from "./DataReader.js";
 import BigIntUtils from "../Util/BigIntUtils.js";
+import ArmariusError from '../Error/ArmariusError.js';
 
 
 export default class ArrayBufferReader extends DataReader {
@@ -35,10 +36,10 @@ export default class ArrayBufferReader extends DataReader {
      */
     async readAt(offset, length, longLived) {
         if (offset < 0) {
-            throw new Error(`Cannot read at negative offsets (got ${offset})`);
+            throw new ArmariusError(`Cannot read at negative offsets (got ${offset})`);
         }
         if (offset + length > this.byteLength) {
-            throw new Error(`Cannot read beyond end of data (trying to read ${length} bytes at ${offset}, data length is ${this.byteLength})`);
+            throw new ArmariusError(`Cannot read beyond end of data (trying to read ${length} bytes at ${offset}, data length is ${this.byteLength})`);
         }
         if (longLived && this.byteLength - length > 64) {
             return this.data.slice(this.byteOffset + offset, this.byteOffset + offset + length);

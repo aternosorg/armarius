@@ -1,3 +1,5 @@
+import ArmariusError from '../Error/ArmariusError.js';
+
 export default class CP437 {
     /** @type {number[]} */ static chars = [
         0x0000, 0x263a, 0x263b, 0x2665, 0x2666, 0x2663, 0x2660, 0x2022, 0x25d8, 0x25cb, 0x25d9, 0x2642, 0x2640, 0x266a,
@@ -44,7 +46,7 @@ export default class CP437 {
             let index = this.chars.indexOf(str.codePointAt(i));
             if (index === -1) {
                 let char = str.charAt(i);
-                throw new Error(`Cannot encode character '${char}' at '${str.substring(0, i).slice(-16)}[${char}]${str.substring(i + 1, i + 17)}'`);
+                throw new ArmariusError(`Cannot encode character '${char}' at '${str.substring(0, i).slice(-16)}[${char}]${str.substring(i + 1, i + 17)}'`);
             }
             result[i] = index;
         }
@@ -61,7 +63,7 @@ export default class CP437 {
             let char = this.chars[value];
             if (typeof char !== 'number') {
                 let hex = value.toString(16).padStart(4, '0');
-                throw new Error(`Cannot decode character 0x${hex} at '${result.slice(-16)}\\u${hex}'`);
+                throw new ArmariusError(`Cannot decode character 0x${hex} at '${result.slice(-16)}\\u${hex}'`);
             }
             result += String.fromCodePoint(char);
         }

@@ -11,6 +11,7 @@ import UnicodeExtraField from '../Structure/ExtraField/UnicodeExtraField.js';
 import MsDosTime from '../../Util/MsDosTime.js';
 import BigInt from '../../Util/BigInt.js';
 import {CRC32} from '../../../index.js';
+import FeatureError from '../../Error/FeatureError.js';
 
 const encoder = new TextEncoder();
 
@@ -314,7 +315,7 @@ export default class EntrySource {
     getDataProcessor(reader, method = this.options.compressionMethod) {
         let Processor = this.options.dataProcessors.get(method);
         if (!Processor) {
-            throw new Error(`Unsupported compression method ${method}`);
+            throw new FeatureError(`Unsupported compression method ${method}`);
         }
         return new Processor(reader, true);
     }
