@@ -14,7 +14,7 @@ For deflate/inflate support, this library depends on the [Compression Streams AP
 Armarius can be installed using npm:
 
 ```shell
-npm install amarius
+npm install armarius
 ```
 
 It can then be loaded as an ES Module:
@@ -36,7 +36,7 @@ objects. Other readers can be implemented by extending the [DataReader](src/Read
 
 ```javascript
 let fileInput = document.getElementById('file-input');
-let reader = armarius.BrowserFileReader(fileInput.files[0]);
+let reader = new armarius.BrowserFileReader(fileInput.files[0]);
 ```
 
 A [ReadArchive](src/Archive/ReadArchive.js) can then be created from the reader.
