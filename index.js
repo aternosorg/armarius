@@ -33,6 +33,7 @@ export { default as ExtraField } from "./src/Archive/Structure/ExtraField/ExtraF
 export { default as UnicodeExtraField } from "./src/Archive/Structure/ExtraField/UnicodeExtraField.js";
 
 export { default as DataReader } from "./src/Reader/DataReader.js";
+export { default as BufferedDataReader } from "./src/Reader/BufferedDataReader.js";
 export { default as BrowserFileReader } from "./src/Reader/BrowserFileReader.js";
 export { default as ArrayBufferReader } from "./src/Reader/ArrayBufferReader.js";
 
