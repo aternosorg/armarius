@@ -12,6 +12,12 @@ export default class NativeStreamDataProcessor extends AbstractDataProcessor {
      */
     static isSupported() {
         if (this.supported === null) {
+            if (typeof navigator !== 'undefined' && navigator.userAgent &&
+                /^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
+                this.supported = false;
+                return this.supported;
+            }
+
             try {
                 // noinspection JSUnresolvedFunction
                 new CompressionStream('deflate-raw');
