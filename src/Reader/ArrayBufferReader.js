@@ -15,9 +15,9 @@ export default class ArrayBufferReader extends DataReader {
     constructor(buffer, offset = 0, length = null) {
         super();
         this.data = new Uint8Array(buffer);
-        this.view = new DataView(buffer, offset, length);
-        this.byteOffset = offset;
         this.byteLength = length ?? buffer.byteLength;
+        this.view = new DataView(buffer, offset, this.byteLength);
+        this.byteOffset = offset;
     }
 
     /**
