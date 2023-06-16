@@ -53,12 +53,13 @@ export default class NativeStreamDataProcessor extends AbstractDataProcessor {
      * @inheritDoc
      */
     resetStreams() {
+        let chunkReader = this.chunkReader;
         this.processor = this.createProcessorStream();
         this.stream = new ReadableStream({
             pull: async (controller) => {
-                let data = await this.getChunkFromReader(Constants.DEFAULT_CHUNK_SIZE);
+                let data = await chunkReader.getChunk(Constants.DEFAULT_CHUNK_SIZE);
                 controller.enqueue(data);
-                if(this.eof) {
+                if(this.chunkReader.isEof()) {
                     controller.close();
                 }
             }
@@ -69,8 +70,8 @@ export default class NativeStreamDataProcessor extends AbstractDataProcessor {
     /**
      * @inheritDoc
      */
-    reset() {
-        super.reset();
+    async reset() {
+        await super.reset();
         this.processor = null;
         this.stream = null;
         this.streamReader = null;

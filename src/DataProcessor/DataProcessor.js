@@ -24,13 +24,6 @@ export default class DataProcessor {
 
     /**
      * @param {number} length
-     * @return {Promise<Uint8Array>}
-     */
-    async getChunkFromReader(length) {
-    }
-
-    /**
-     * @param {number} length
      * @return {Promise<?Uint8Array>}
      * @protected
      * @abstract
@@ -45,7 +38,10 @@ export default class DataProcessor {
     async read(length) {
     }
 
-    reset() {
+    /**
+     * @return {Promise<void>}
+     */
+    async reset() {
     }
 }
 

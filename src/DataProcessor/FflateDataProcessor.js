@@ -19,11 +19,11 @@ export default class FflateDataProcessor extends AbstractDataProcessor {
      * @inheritDoc
      */
     async generate(length) {
-        if(this.eof) {
+        if(this.chunkReader.isEof()) {
             return null;
         }
 
-        this.flate.push(await this.getChunkFromReader(length), this.eof);
+        this.flate.push(await this.chunkReader.getChunk(length), this.chunkReader.isEof());
         return this.concatChunks();
     }
 
@@ -72,8 +72,8 @@ export default class FflateDataProcessor extends AbstractDataProcessor {
     /**
      * @inheritDoc
      */
-    reset() {
-        super.reset();
+    async reset() {
+        await super.reset();
         this.chunks = [];
         this.initFflate();
     }

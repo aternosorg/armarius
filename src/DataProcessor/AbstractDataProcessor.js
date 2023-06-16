@@ -1,14 +1,15 @@
 import CRC32 from '../Util/CRC32.js';
 import DataProcessor from './DataProcessor.js';
+import DataProcessorChunkReader from './DataProcessorChunkReader.js';
 
 /**
  * @implements DataProcessor
  */
 export default class AbstractDataProcessor extends DataProcessor {
     /** @type {DataReader} */ reader;
-    /** @type {boolean} */ eof = false;
-    /** @type {?CRC32} */ preCrc = null;
+    /** @type {DataProcessorChunkReader} */ chunkReader;
     /** @type {?CRC32} */ postCrc = null;
+    /** @type {boolean} */ createPreCrc = false;
 
     /**
      * @inheritDoc
@@ -25,7 +26,8 @@ export default class AbstractDataProcessor extends DataProcessor {
     constructor(reader, createPreCrc = false, createPostCrc = false) {
         super();
         this.reader = reader;
-        this.preCrc = createPreCrc ? new CRC32() : null;
+        this.createPreCrc = createPreCrc;
+        this.chunkReader = new DataProcessorChunkReader(this.reader, this.createPreCrc);
         this.postCrc = createPostCrc ? new CRC32() : null;
     }
 
@@ -33,7 +35,7 @@ export default class AbstractDataProcessor extends DataProcessor {
      * @inheritDoc
      */
     getPreCrc() {
-        return this.preCrc;
+        return this.chunkReader.getCrc();
     }
 
     /**
@@ -41,22 +43,6 @@ export default class AbstractDataProcessor extends DataProcessor {
      */
     getPostCrc() {
         return this.postCrc;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    async getChunkFromReader(length) {
-        if (this.reader.offset + length > this.reader.byteLength) {
-            this.eof = true;
-            length = this.reader.byteLength - this.reader.offset;
-        }
-        let chunk = await this.reader.read(length);
-        if(this.preCrc) {
-            this.preCrc.add(chunk);
-        }
-
-        return chunk;
     }
 
     async process() {
@@ -82,9 +68,12 @@ export default class AbstractDataProcessor extends DataProcessor {
         return chunk;
     }
 
-    reset() {
-        this.eof = false;
-        this.preCrc?.reset();
+    /**
+     * @inheritDoc
+     */
+    async reset() {
+        await this.chunkReader.close();
+        this.chunkReader = new DataProcessorChunkReader(this.reader, this.createPreCrc);
         this.postCrc?.reset();
         this.reader.seek(0);
     }

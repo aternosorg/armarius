@@ -68,7 +68,7 @@ export default class FallbackDataProcessor extends DataProcessor {
     /**
      * @inheritDoc
      */
-    reset() {
-        this.dataProcessor.reset();
+    async reset() {
+        await this.dataProcessor.reset();
     }
 }

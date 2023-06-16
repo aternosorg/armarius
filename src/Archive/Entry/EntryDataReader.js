@@ -16,8 +16,8 @@ export default class EntryDataReader {
         this.expectedCrc32 = expectedCrc32;
     }
 
-    reset() {
-        this.dataProcessor.reset();
+    async reset() {
+        await this.dataProcessor.reset();
         this.eof = false;
     }
 
