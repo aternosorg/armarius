@@ -2,8 +2,8 @@ import {
     ArchiveEntry,
     ArchiveMerger,
     ArrayBufferReader,
-    Constants,
-    DataReaderEntrySource, ExtendedTimestamp,
+    Constants, CRC32,
+    DataReaderEntrySource, ExtendedTimestamp, NodeDeflateDataProcessor, NodeInflateDataProcessor,
     ReadArchive,
     UnicodeExtraField,
     WriteArchive
@@ -12,6 +12,7 @@ import {FakeDataReader, openFileReader, writeArchive, writeArchiveToBuffer} from
 import BigInt from '../src/Util/BigInt.js';
 
 const encoder = new TextEncoder();
+const decoder = new TextDecoder();
 const timestamp = 1655914036000;
 const timestampSeconds = Math.floor(timestamp/1000);
 const date = new Date(timestamp);
@@ -44,6 +45,48 @@ test('Write large file archive', async () => {
     expect(entry.zip64ExtendedInformation).toBeTruthy();
     expect(entry.getUncompressedSize()).toBe(BigInt(size));
     expect(entry.getCrc()).toBe(126491095);
+});
+
+test('Write and read archive using NodeJS data processors', async () => {
+    let fileName = 'file.txt';
+    let i = 0;
+    let payloadString = 'Hello World!';
+    let payload = encoder.encode(payloadString);
+
+    let writeDataProcessors = new Map([
+        [Constants.COMPRESSION_METHOD_DEFLATE, NodeDeflateDataProcessor]
+    ]);
+
+    let readDataProcessors = new Map([
+        [Constants.COMPRESSION_METHOD_DEFLATE, NodeInflateDataProcessor]
+    ]);
+
+    let archive = new WriteArchive(() => {
+        if(i > 0) {
+            return null;
+        }
+        i++;
+        return new DataReaderEntrySource(new ArrayBufferReader(payload.buffer, payload.byteOffset, payload.byteLength), {
+            fileName: fileName,
+            dataProcessors: writeDataProcessors
+        });
+    });
+    let data = await writeArchiveToBuffer(archive);
+
+    let readArchive = new ReadArchive(new ArrayBufferReader(data.buffer, data.byteOffset, data.byteLength), {
+        entryOptions: {
+            dataProcessors: readDataProcessors
+        }
+    });
+    await readArchive.init();
+    let entries = await readArchive.getAllEntries();
+
+    expect(entries.length).toBe(1);
+
+    let entry = entries.pop();
+    expect(entry.getFileNameString()).toBe(fileName);
+    expect(decoder.decode(await entry.getData())).toBe(payloadString);
+    expect(entry.getCrc()).toBe(CRC32.hash(payload));
 });
 
 test('Write many entries', async () => {

@@ -1,5 +1,5 @@
-import Constants from '../Constants.js';
-import AbstractDataProcessor from './AbstractDataProcessor.js';
+import Constants from '../../Constants.js';
+import AbstractDataProcessor from '../AbstractDataProcessor.js';
 
 export default class NativeStreamDataProcessor extends AbstractDataProcessor {
     /** @type {?boolean} */ static supported = null;
