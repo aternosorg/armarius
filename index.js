@@ -35,6 +35,7 @@ export { default as UnicodeExtraField } from "./src/Archive/Structure/ExtraField
 export { default as DataReader } from "./src/Reader/DataReader.js";
 export { default as BufferedDataReader } from "./src/Reader/BufferedDataReader.js";
 export { default as BrowserFileReader } from "./src/Reader/BrowserFileReader.js";
+export { default as NodeFileReader } from "./src/Reader/NodeFileReader.js";
 export { default as ArrayBufferReader } from "./src/Reader/ArrayBufferReader.js";
 
 export { default as CP437 } from "./src/Util/CP437.js";
