@@ -23,22 +23,33 @@ export default class WriteArchive {
     /** @type {number} */ bytesWritten = 0;
 
     /**
-     * @param {Function} nextEntryFunction
+     * @param {(() => Promise<EntrySource|null>)|Generator<EntrySource>|AsyncGenerator<EntrySource>} nextEntryFunction
      * @param {WriteArchiveOptions|WriteArchiveOptionsObject} options
      */
     constructor(nextEntryFunction, options = {}) {
-        this.nextEntryFunction = nextEntryFunction;
+        this.setNextEntryFunction(nextEntryFunction);
         this.options = WriteArchiveOptions.from(options);
 
         this.zip64 = this.options.forceZIP64;
     }
 
     /**
-     * @param {Function} fn
-     * @returns {WriteArchive}
+     * @param {(() => Promise<EntrySource|null>)|Generator<EntrySource>|AsyncGenerator<EntrySource>} fn
+     * @returns {this}
      */
     setNextEntryFunction(fn) {
-        this.nextEntryFunction = fn;
+        if(typeof fn.next !== 'function') {
+            this.nextEntryFunction = fn;
+            return this;
+        }
+
+        this.nextEntryFunction = async () => {
+            let res = await fn.next();
+            if(res.done) {
+                return null;
+            }
+            return res.value;
+        }
         return this;
     }
 

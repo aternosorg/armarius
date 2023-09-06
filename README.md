@@ -127,7 +127,7 @@ After all data was read, null will be returned instead.
 ### Writing archives
 
 New archives can be created using a [WriteArchive](src/Archive/WriteArchive.js) object.
-The [WriteArchive](src/Archive/WriteArchive.js) constructor needs to be passed a function that generates
+The [WriteArchive](src/Archive/WriteArchive.js) constructor needs to be passed a function, Generator or AsyncGenerator that generates
 new [EntrySource](src/Archive/EntrySource/EntrySource.js) objects when needed.
 
 Additionally, a [WriteArchiveOptions](src/Options/WriteArchiveOptions.js) object can be passed:
@@ -138,7 +138,7 @@ Additionally, a [WriteArchiveOptions](src/Options/WriteArchiveOptions.js) object
 
 ```javascript
 async function generateNextEntrySource() {
-    //Create a new EntrySource
+    //Create a new EntrySource or return null if no more entries should be added to the archive
     return null;
 }
 
