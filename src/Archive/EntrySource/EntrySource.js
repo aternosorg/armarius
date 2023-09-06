@@ -10,7 +10,7 @@ import DataDescriptor from '../Structure/DataDescriptor.js';
 import UnicodeExtraField from '../Structure/ExtraField/UnicodeExtraField.js';
 import MsDosTime from '../../Util/MsDosTime.js';
 import BigInt from '../../Util/BigInt.js';
-import {CRC32} from '../../../index.js';
+import CRC32 from '../../Util/CRC32.js';
 import FeatureError from '../../Error/FeatureError.js';
 
 const encoder = new TextEncoder();
