@@ -256,7 +256,7 @@ mergeSource
 
 While mainly intended for use in web browsers, this library can also be used in Node.js.
 
-To read data from files, a `NodeFileReader` can be used:
+To read data from files, a [NodeFileReader](src/Reader/NodeFileReader.js) can be used:
 ```javascript
 import * as fs from 'node:fs';
 
