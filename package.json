@@ -5,6 +5,7 @@
   "repository": "github:aternosorg/armarius",
   "type": "module",
   "main": "index.js",
+  "browser": "index-browser.js",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",

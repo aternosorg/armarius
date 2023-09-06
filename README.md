@@ -252,6 +252,48 @@ mergeSource
     });
 ```
 
+### Node.js
+
+While mainly intended for use in web browsers, this library can also be used in Node.js.
+
+To read data from files, a `NodeFileReader` can be used:
+```javascript
+import * as fs from 'node:fs';
+
+let file = await fs.promises.open('path/to/file.zip', 'r');
+let stat = await file.stat();
+let reader = new armarius.NodeFileReader(file, 0, stat.size);
+```
+
+While the default compression system works in Node.js since it falls back to [fflate](https://github.com/101arrowz/fflate), it is possible to explicitly use [zlib](https://nodejs.org/api/zlib.html) instead:
+```javascript
+
+const compressionDataProcessors = new Map([
+    [armarius.Constants.COMPRESSION_METHOD_DEFLATE, armarius.NodeDeflateDataProcessor],
+    [armarius.Constants.COMPRESSION_METHOD_STORE, armarius.PassThroughDataProcessor]
+]);
+
+let entrySource = new armarius.DataReaderEntrySource(reader, {
+    fileName: 'file.txt',
+    compressionMethod: armarius.Constants.COMPRESSION_METHOD_DEFLATE,
+    dataProcessors: compressionDataProcessors
+});
+```
+
+```javascript
+
+const decompressionDataProcessors = new Map([
+    [armarius.Constants.COMPRESSION_METHOD_DEFLATE, armarius.NodeInflateDataProcessor],
+    [armarius.Constants.COMPRESSION_METHOD_STORE, armarius.PassThroughDataProcessor]
+]);
+
+let archive = new armarius.ReadArchive(reader, {
+    entryOptions: {
+        dataProcessors: decompressionDataProcessors
+    }
+});
+```
+
 ## License
 
 Armarius is open source software released under the MIT license, see [license](LICENSE).
