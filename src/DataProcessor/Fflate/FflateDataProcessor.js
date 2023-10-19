@@ -13,7 +13,7 @@ export default class FflateDataProcessor extends AbstractDataProcessor {
      */
     constructor(reader, createPreCrc = false, createPostCrc = false) {
         super(reader, createPreCrc, createPostCrc);
-        this.reset();
+        this.initFflate();
     }
 
     /**
