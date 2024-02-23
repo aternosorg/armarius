@@ -15,8 +15,7 @@
   "author": "Kurt Thiemann <kurt@aternos.org>",
   "license": "MIT",
   "dependencies": {
-    "armarius-io": "^1.0.1",
-    "fflate": "^0.7.3"
+    "armarius-io": "^1.0.1"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
