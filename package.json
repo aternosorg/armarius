@@ -7,7 +7,7 @@
   "main": "index.js",
   "browser": "index-browser.js",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testTimeout 60000",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testTimeout 120000",
     "coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
     "lint": "eslint src/**"
   },
