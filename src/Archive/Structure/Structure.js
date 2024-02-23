@@ -3,11 +3,11 @@
  */
 export default class Structure {
     /**
-     * @param {DataReader} reader
+     * @param {import("armarius-io").IO} io
      * @returns {Promise<void>}
      * @abstract
      */
-    async read(reader) {
+    async read(io) {
 
     }
 
@@ -20,12 +20,12 @@ export default class Structure {
     }
 
     /**
-     * @param {DataReader} reader
+     * @param {import("armarius-io").IO} io
      * @returns {Promise<this>}
      */
-    static async fromReader(reader) {
+    static async fromIO(io) {
         let structure = new this();
-        await structure.read(reader);
+        await structure.read(io);
         return structure;
     }
 }

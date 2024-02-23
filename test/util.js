@@ -1,7 +1,7 @@
-import {DataReader} from '../index.js';
+import {IO, NodeFileIO} from 'armarius-io';
 import * as fs from 'fs';
 
-export class FakeDataReader extends DataReader {
+export class FakeDataIO extends IO {
     fill;
 
     constructor(length, fill) {
@@ -21,29 +21,25 @@ export class FakeDataReader extends DataReader {
         let data = Buffer.alloc(length, this.fill);
         return new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
     }
-}
 
-export class NodeFileReader extends DataReader {
-    /** @type {FileHandle} */ fileHandle;
-
-    constructor(fileHandle, size) {
-        super();
-        this.fileHandle = fileHandle;
-        this.byteLength = size;
+    isCloneable() {
+        return true;
     }
 
-    async clone(cloneOffset = 0, cloneLength = null) {
-        return new this.constructor(this.fileHandle, cloneLength ?? this.byteLength - cloneOffset);
+    isReadable() {
+        return true;
     }
 
-    async readAt(offset, length, longLived) {
-        let data = Buffer.alloc(length);
-        await this.fileHandle.read({
-            buffer: data,
-            length: length,
-            position: this.byteOffset + offset
-        });
-        return new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+    isSeekable() {
+        return true;
+    }
+
+    isWritable() {
+        return false;
+    }
+
+    async writeAt(offset, data) {
+        return Promise.resolve(undefined);
     }
 }
 
@@ -70,5 +66,5 @@ export async function writeArchiveToBuffer(archive) {
 export async function openFileReader(path) {
     let file = await fs.promises.open(path, 'r');
     let stat = await file.stat();
-    return new NodeFileReader(file, stat.size);
+    return new NodeFileIO(file, 0, stat.size);
 }

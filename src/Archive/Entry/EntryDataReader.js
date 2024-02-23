@@ -1,11 +1,9 @@
-import CRC32 from "../../Util/CRC32.js";
 import ChecksumError from '../../Error/ChecksumError.js';
 
 export default class EntryDataReader {
     /** @type {DataProcessor} */ dataProcessor;
-    /** @type {CRC32} */ crc32;
+    /** @type {import("armarius-io").CRC32} */ crc32;
     /** @type {number} */ expectedCrc32;
-    /** @type {boolean} */ createChecksum = true;
 
     /**
      * @param {DataProcessor} dataProcessor

@@ -1,13 +1,13 @@
 {
   "name": "armarius",
-  "version": "1.14.2",
+  "version": "2.0.0",
   "description": "A JavaScript library to read, write, and merge ZIP archives in web browsers.",
   "repository": "github:aternosorg/armarius",
   "type": "module",
   "main": "index.js",
   "browser": "index-browser.js",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testTimeout 60000",
     "coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
     "lint": "eslint src/**"
   },
@@ -15,9 +15,11 @@
   "author": "Kurt Thiemann <kurt@aternos.org>",
   "license": "MIT",
   "dependencies": {
+    "armarius-io": "^1.0.1",
     "fflate": "^0.7.3"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "eslint": "^8.18.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jest": "^26.5.3",

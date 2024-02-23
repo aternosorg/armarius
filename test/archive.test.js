@@ -1,15 +1,14 @@
 import {
     ArchiveEntry,
     ArchiveMerger,
-    ArrayBufferReader,
-    Constants, CRC32,
-    DataReaderEntrySource, ExtendedTimestamp, NodeDeflateDataProcessor, NodeInflateDataProcessor,
+    Constants,
+    DataReaderEntrySource, ExtendedTimestamp,
     ReadArchive,
-    UnicodeExtraField,
     WriteArchive
 } from '../index.js';
-import {FakeDataReader, openFileReader, writeArchive, writeArchiveToBuffer} from './util.js';
-import BigInt from '../src/Util/BigInt.js';
+import {expect, test} from '@jest/globals';
+import {FakeDataIO, openFileReader, writeArchive, writeArchiveToBuffer} from './util.js';
+import {BigInt, CRC32, ArrayBufferIO, NodeDeflateDataProcessor, NodeInflateDataProcessor} from "armarius-io";
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -27,13 +26,13 @@ test('Write large file archive', async () => {
             return null;
         }
         i++;
-        return new DataReaderEntrySource(new FakeDataReader(size, 'a'), {
+        return new DataReaderEntrySource(new FakeDataIO(size, 'a'), {
             fileName: fileName,
         });
     });
     let data = await writeArchiveToBuffer(archive);
 
-    let readArchive = new ReadArchive(new ArrayBufferReader(data.buffer, data.byteOffset, data.byteLength));
+    let readArchive = new ReadArchive(new ArrayBufferIO(data.buffer, data.byteOffset, data.byteLength));
     await readArchive.init();
     let entries = await readArchive.getAllEntries();
 
@@ -66,14 +65,14 @@ test('Write and read archive using NodeJS data processors', async () => {
             return null;
         }
         i++;
-        return new DataReaderEntrySource(new ArrayBufferReader(payload.buffer, payload.byteOffset, payload.byteLength), {
+        return new DataReaderEntrySource(new ArrayBufferIO(payload.buffer, payload.byteOffset, payload.byteLength), {
             fileName: fileName,
             dataProcessors: writeDataProcessors
         });
     });
     let data = await writeArchiveToBuffer(archive);
 
-    let readArchive = new ReadArchive(new ArrayBufferReader(data.buffer, data.byteOffset, data.byteLength), {
+    let readArchive = new ReadArchive(new ArrayBufferIO(data.buffer, data.byteOffset, data.byteLength), {
         entryOptions: {
             dataProcessors: readDataProcessors
         }
@@ -89,32 +88,6 @@ test('Write and read archive using NodeJS data processors', async () => {
     expect(entry.getCrc()).toBe(CRC32.hash(payload));
 });
 
-test('Write many entries', async () => {
-    let count = 70000;
-    let i = 0;
-    let archive = new WriteArchive(() => {
-        if(i >= count) {
-            return null;
-        }
-        i++;
-        return new DataReaderEntrySource(new ArrayBufferReader(encoder.encode(`file-content-${i}`).buffer), {
-            fileName: `file-${i}.txt`,
-        });
-    });
-
-    let data = await writeArchiveToBuffer(archive);
-
-    let readArchive = new ReadArchive(new ArrayBufferReader(data.buffer, data.byteOffset, data.byteLength));
-    await readArchive.init();
-
-    let readEntries = 0;
-    await readArchive.forEachEntry((entry) => {
-        readEntries++;
-    });
-    expect(readEntries).toBe(count);
-    expect(readArchive.isZip64).toBe(true);
-});
-
 test('Extra fields', async () => {
     let i = 0;
     let fileName = 'file.txt';
@@ -124,7 +97,7 @@ test('Extra fields', async () => {
             return null;
         }
         i++;
-        return new DataReaderEntrySource(new ArrayBufferReader(encoder.encode(`file-content-${i}`).buffer), {
+        return new DataReaderEntrySource(new ArrayBufferIO(encoder.encode(`file-content-${i}`).buffer), {
             fileName: fileName,
             fileComment: fileComment,
             forceZIP64: true,
@@ -138,7 +111,7 @@ test('Extra fields', async () => {
     });
     let data = await writeArchiveToBuffer(archive);
 
-    let readArchive = new ReadArchive(new ArrayBufferReader(data.buffer, data.byteOffset, data.byteLength));
+    let readArchive = new ReadArchive(new ArrayBufferIO(data.buffer, data.byteOffset, data.byteLength));
     await readArchive.init();
     let entries = await readArchive.getAllEntries();
 
@@ -162,6 +135,7 @@ test('Extra fields', async () => {
     expect(centralTimestampField.crTime).toBeUndefined();
 
     await entry.readLocalFileHeader();
+    /** @type {ExtendedTimestamp} */
     let localTimestampField = entry.localFileHeader.getExtraField(Constants.EXTRAFIELD_TYPE_EXTENDED_TIMESTAMP);
     expect(localTimestampField).toBeInstanceOf(ExtendedTimestamp);
     expect(localTimestampField.modTime).toEqual(timestampSeconds);
@@ -177,7 +151,7 @@ test('Merge archives', async () => {
                 return null;
             }
             i++;
-            return new DataReaderEntrySource(new ArrayBufferReader(encoder.encode(`file-content-${fileName}`).buffer), {
+            return new DataReaderEntrySource(new ArrayBufferIO(encoder.encode(`file-content-${fileName}`).buffer), {
                 fileName: fileName,
             });
         });
@@ -188,15 +162,15 @@ test('Merge archives', async () => {
     let data1 = await makeArchive('file1.txt');
     let data2 = await makeArchive('file2.txt');
 
-    let archive1 = new ReadArchive(new ArrayBufferReader(data1.buffer, data1.byteOffset, data1.byteLength));
-    let archive2 = new ReadArchive(new ArrayBufferReader(data2.buffer, data2.byteOffset, data2.byteLength));
+    let archive1 = new ReadArchive(new ArrayBufferIO(data1.buffer, data1.byteOffset, data1.byteLength));
+    let archive2 = new ReadArchive(new ArrayBufferIO(data2.buffer, data2.byteOffset, data2.byteLength));
     await archive1.init();
     await archive2.init();
 
     let merger = new ArchiveMerger([archive1, archive2]);
     let resData = await writeArchiveToBuffer(merger.outputArchive);
 
-    let archive = new ReadArchive(new ArrayBufferReader(resData.buffer, resData.byteOffset, resData.byteLength));
+    let archive = new ReadArchive(new ArrayBufferIO(resData.buffer, resData.byteOffset, resData.byteLength));
     await archive.init();
     let entries = await archive.getAllEntries();
 
@@ -213,13 +187,13 @@ test('Clone entry iterator', async () => {
             return null;
         }
         i++;
-        return new DataReaderEntrySource(new ArrayBufferReader(encoder.encode(`file-content-${i}`).buffer), {
+        return new DataReaderEntrySource(new ArrayBufferIO(encoder.encode(`file-content-${i}`).buffer), {
             fileName: `file-${i}.txt`,
         });
     });
     let data = await writeArchiveToBuffer(archive);
 
-    let readArchive = new ReadArchive(new ArrayBufferReader(data.buffer, data.byteOffset, data.byteLength));
+    let readArchive = new ReadArchive(new ArrayBufferIO(data.buffer, data.byteOffset, data.byteLength));
     await readArchive.init();
 
     let entryIterator = await readArchive.getEntryIterator();

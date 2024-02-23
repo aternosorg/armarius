@@ -7,12 +7,12 @@ import ArchiveIndex from "../Index/ArchiveIndex.js";
 import EntryReference from "./Entry/EntryReference.js";
 import EntryIterator from "./Entry/EntryIterator.js";
 import ReadArchiveOptions from "../Options/ReadArchiveOptions.js";
-import BigInt from "../Util/BigInt.js";
+import {BigInt} from 'armarius-io';
 import ZipError from '../Error/ZipError.js';
 import FeatureError from '../Error/FeatureError.js';
 
 export default class ReadArchive {
-    /** @type {DataReader} */ reader;
+    /** @type {import("armarius-io").IO} */ io;
     /** @type {ReadArchiveOptions} */ options;
     /** @type {ArchiveIndex} */ centralDirectoryIndex;
     /** @type {number} */ endOfCentralDirectoryOffset;
@@ -21,18 +21,18 @@ export default class ReadArchive {
     /** @type {number} */ centralDirectoryByteLength;
     /** @type {number} */ centralDirectoryEntryCount;
     /** @type {boolean} */ isZip64 = false;
-    /** @type {DataReader} */ centralDirectoryReader;
+    /** @type {import("armarius-io").IO} */ centralDirectoryIO;
     /** @type {number} */ prependedDataLength = 0;
     /** @type {EndOfCentralDirectoryRecord} */ endOfCentralDirectoryRecord;
     /** @type {EndOfCentralDirectoryRecord64} */ endOfCentralDirectoryRecord64;
     /** @type {EndOfCentralDirectoryLocator64} */ endOfCentralDirectoryLocator64;
 
     /**
-     * @param {DataReader} reader
+     * @param {import("armarius-io").IO} io
      * @param {ReadArchiveOptions|ReadArchiveOptionsObject} options
      */
-    constructor(reader, options = {}) {
-        this.reader = reader;
+    constructor(io, options = {}) {
+        this.io = io;
         this.options = ReadArchiveOptions.from(options);
     }
 
@@ -41,13 +41,13 @@ export default class ReadArchive {
      * @returns {Promise<void>}
      */
     async init() {
-        if (this.reader.byteLength < Constants.LENGTH_END_OF_CENTRAL_DIR) {
+        if (this.io.byteLength < Constants.LENGTH_END_OF_CENTRAL_DIR) {
             throw new ZipError('Total file length is shorter than end of central directory record');
         }
 
         this.endOfCentralDirectoryOffset = await this.findEndOfCentralDirectoryRecord();
 
-        this.endOfCentralDirectoryRecord = await EndOfCentralDirectoryRecord.fromReader(await this.reader.clone(this.endOfCentralDirectoryOffset));
+        this.endOfCentralDirectoryRecord = await EndOfCentralDirectoryRecord.fromIO(await this.io.clone(this.endOfCentralDirectoryOffset));
         this.centralDirectoryByteLength = this.endOfCentralDirectoryRecord.centralDirectorySize;
         this.centralDirectoryOffset = this.endOfCentralDirectoryRecord.centralDirectoryOffset;
         this.centralDirectoryEntryCount = this.endOfCentralDirectoryRecord.centralDirectoryEntries;
@@ -70,12 +70,12 @@ export default class ReadArchive {
             await this.readZip64Structures();
         }
 
-        if (this.centralDirectoryOffset < 0 || this.centralDirectoryOffset >= this.reader.byteLength) {
+        if (this.centralDirectoryOffset < 0 || this.centralDirectoryOffset >= this.io.byteLength) {
             throw new ZipError('Invalid central directory data offset');
         }
 
         let offset = 0;
-        this.centralDirectoryReader = await this.reader.clone(this.centralDirectoryOffset, this.centralDirectoryByteLength);
+        this.centralDirectoryIO = await this.io.clone(this.centralDirectoryOffset, this.centralDirectoryByteLength);
 
         /*
         If there are entries in the central directory, we can check whether we are at the correct location by looking
@@ -89,15 +89,15 @@ export default class ReadArchive {
                 possibleCentralDirectoryOffset = this.endOfCentralDirectoryOffset - this.centralDirectoryByteLength;
             }
 
-            if (await this.centralDirectoryReader.getUint32At(offset) !== Constants.SIGNATURE_CENTRAL_DIR_FILE_HEADER &&
+            if (await this.centralDirectoryIO.getUint32At(offset) !== Constants.SIGNATURE_CENTRAL_DIR_FILE_HEADER &&
                 this.centralDirectoryOffset !== possibleCentralDirectoryOffset) {
                 const oldCentralDirectoryOffset = this.centralDirectoryOffset;
                 this.centralDirectoryOffset = possibleCentralDirectoryOffset;
                 this.prependedDataLength = this.centralDirectoryOffset - oldCentralDirectoryOffset;
-                this.centralDirectoryReader = await this.reader.clone(this.centralDirectoryOffset, this.centralDirectoryByteLength);
+                this.centralDirectoryIO = await this.io.clone(this.centralDirectoryOffset, this.centralDirectoryByteLength);
             }
         }
-        if (this.centralDirectoryOffset < 0 || this.centralDirectoryOffset >= this.reader.byteLength) {
+        if (this.centralDirectoryOffset < 0 || this.centralDirectoryOffset >= this.io.byteLength) {
             throw new ZipError('Invalid central directory data offset');
         }
     }
@@ -108,12 +108,12 @@ export default class ReadArchive {
      * @returns {Promise<number>}
      */
     async findEndOfCentralDirectoryRecord() {
-        let endOfDirectoryOffset = this.reader.byteLength - Constants.LENGTH_END_OF_CENTRAL_DIR;
-        if(await this.reader.getUint32At(endOfDirectoryOffset) !== Constants.SIGNATURE_END_OF_CENTRAL_DIR) {
-            endOfDirectoryOffset = await this.reader.lastIndexOf(
+        let endOfDirectoryOffset = this.io.byteLength - Constants.LENGTH_END_OF_CENTRAL_DIR;
+        if(await this.io.getUint32At(endOfDirectoryOffset) !== Constants.SIGNATURE_END_OF_CENTRAL_DIR) {
+            endOfDirectoryOffset = await this.io.lastIndexOf(
                 Constants.SIGNATURE_END_OF_CENTRAL_DIR,
-                this.reader.byteLength - Constants.MAX_UINT16 - Constants.LENGTH_END_OF_CENTRAL_DIR,
-                this.reader.byteLength - Constants.LENGTH_END_OF_CENTRAL_DIR
+                this.io.byteLength - Constants.MAX_UINT16 - Constants.LENGTH_END_OF_CENTRAL_DIR,
+                this.io.byteLength - Constants.LENGTH_END_OF_CENTRAL_DIR
             );
             if (endOfDirectoryOffset === -1) {
                 throw new ZipError('Unable to find end of central directory record');
@@ -128,18 +128,18 @@ export default class ReadArchive {
      * @returns {Promise<void>}
      */
     async readZip64Structures() {
-        const endOfDirectoryLocatorReader = await this.reader.clone(
+        const endOfDirectoryLocatorReader = await this.io.clone(
             this.endOfCentralDirectoryOffset - Constants.LENGTH_END_OF_CENTRAL_DIR_LOCATOR_ZIP64,
             Constants.LENGTH_END_OF_CENTRAL_DIR_LOCATOR_ZIP64
         );
-        this.endOfCentralDirectoryLocator64 = await EndOfCentralDirectoryLocator64.fromReader(endOfDirectoryLocatorReader);
+        this.endOfCentralDirectoryLocator64 = await EndOfCentralDirectoryLocator64.fromIO(endOfDirectoryLocatorReader);
 
         if(this.endOfCentralDirectoryLocator64.disks > 1) {
             throw new FeatureError('Multi disk archives are not supported');
         }
 
         this.endOfCentralDirectoryOffset64 = Number(this.endOfCentralDirectoryLocator64.centralDirectoryEndOffset);
-        let endOfDirectoryReader = await this.reader.clone(this.endOfCentralDirectoryOffset64, Constants.LENGTH_END_OF_CENTRAL_DIR_ZIP64);
+        let endOfDirectoryReader = await this.io.clone(this.endOfCentralDirectoryOffset64, Constants.LENGTH_END_OF_CENTRAL_DIR_ZIP64);
 
         /*
          Sometimes, archive data can be prepended by some other data, which means that
@@ -160,10 +160,10 @@ export default class ReadArchive {
             const oldEndOfCentralDirOffset = this.endOfCentralDirectoryOffset64;
             this.endOfCentralDirectoryOffset64 = possibleEndOfDirectoryOffset;
             this.prependedDataLength = this.endOfCentralDirectoryOffset64 - oldEndOfCentralDirOffset;
-            endOfDirectoryReader = await this.reader.clone(this.endOfCentralDirectoryOffset64);
+            endOfDirectoryReader = await this.io.clone(this.endOfCentralDirectoryOffset64);
         }
 
-        this.endOfCentralDirectoryRecord64 = await EndOfCentralDirectoryRecord64.fromReader(endOfDirectoryReader);
+        this.endOfCentralDirectoryRecord64 = await EndOfCentralDirectoryRecord64.fromIO(endOfDirectoryReader);
 
         if(this.endOfCentralDirectoryRecord64.diskNumber !== 0 ||
             this.endOfCentralDirectoryRecord64.centralDirectoryDiskNumber !== 0) {
@@ -181,7 +181,7 @@ export default class ReadArchive {
     async getEntryIterator() {
         return new EntryIterator(
             this,
-            (await this.centralDirectoryReader.clone()).setMaxBufferSize(this.options.centralDirectoryBufferSize),
+            (await this.centralDirectoryIO.clone()).setMaxBufferSize(this.options.centralDirectoryBufferSize),
             this.options.createEntryIndex
         );
     }
@@ -256,15 +256,15 @@ export default class ReadArchive {
 
     /**
      * @param {number} offset
-     * @param {?DataReader} reader
+     * @param {?import("armarius-io").IO} io
      * @returns {Promise<ArchiveEntry>}
      */
-    async readEntryAt(offset, reader = null) {
-        if (!reader) {
-            reader = await this.centralDirectoryReader.clone();
+    async readEntryAt(offset, io = null) {
+        if (!io) {
+            io = await this.centralDirectoryIO.clone();
         }
         let entry = new ArchiveEntry(this);
-        await entry.readCentralDirectoryHeader(reader.seek(offset), offset);
+        await entry.readCentralDirectoryHeader(io.seek(offset), offset);
         return entry;
     }
 
@@ -287,10 +287,10 @@ export default class ReadArchive {
     /**
      * @param {number} offset
      * @param {?number} byteLength
-     * @returns {Promise<DataReader>}
+     * @returns {Promise<import("armarius-io").IO>}
      */
     async getReader(offset = 0, byteLength = null) {
-        return await this.reader.clone(offset, byteLength);
+        return await this.io.clone(offset, byteLength);
     }
 
     /**

@@ -9,8 +9,7 @@ import DataDescriptor64 from '../Structure/DataDescriptor64.js';
 import DataDescriptor from '../Structure/DataDescriptor.js';
 import UnicodeExtraField from '../Structure/ExtraField/UnicodeExtraField.js';
 import MsDosTime from '../../Util/MsDosTime.js';
-import BigInt from '../../Util/BigInt.js';
-import CRC32 from '../../Util/CRC32.js';
+import {BigInt, CRC32} from 'armarius-io';
 import FeatureError from '../../Error/FeatureError.js';
 
 const encoder = new TextEncoder();
@@ -307,17 +306,17 @@ export default class EntrySource {
     }
 
     /**
-     * @param {DataReader} reader
+     * @param {import("armarius-io").DataStream} dataStream
      * @param {number} method
      * @protected
      * @returns {DataProcessor}
      */
-    getDataProcessor(reader, method = this.options.compressionMethod) {
+    getDataProcessor(dataStream, method = this.options.compressionMethod) {
         let Processor = this.options.dataProcessors.get(method);
         if (!Processor) {
             throw new FeatureError(`Unsupported compression method ${method}`);
         }
-        return new Processor(reader, true);
+        return new Processor(dataStream, true);
     }
 
     /**

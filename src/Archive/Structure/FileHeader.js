@@ -1,5 +1,5 @@
 import SignatureStructure from "./SignatureStructure.js";
-import ArrayBufferReader from "../../Reader/ArrayBufferReader.js";
+import {ArrayBufferIO} from "armarius-io";
 import GenericExtraField from "./ExtraField/GenericExtraField.js";
 import Constants from "../../Constants.js";
 import Zip64ExtendedInformation from "./ExtraField/Zip64ExtendedInformation.js";
@@ -155,14 +155,14 @@ export default class FileHeader extends SignatureStructure {
     async loadExtraFields() {
         this.extraFields = new Map();
         let rawBuffer = this.extraField;
-        let reader = new ArrayBufferReader(rawBuffer.buffer, rawBuffer.byteOffset, rawBuffer.byteLength);
+        let io = new ArrayBufferIO(rawBuffer.buffer, rawBuffer.byteOffset, rawBuffer.byteLength);
         try {
-            while (reader.offset < reader.byteLength) {
-                const type = await reader.getUint16();
+            while (io.offset < io.byteLength) {
+                const type = await io.getUint16();
 
-                let startOffset = reader.offset;
-                let field = await this.loadExtraField(type, reader);
-                reader.seek(startOffset + 2 + field.size);
+                let startOffset = io.offset;
+                let field = await this.loadExtraField(type, io);
+                io.seek(startOffset + 2 + field.size);
 
                 this.extraFields.set(type, field);
             }
@@ -173,21 +173,21 @@ export default class FileHeader extends SignatureStructure {
 
     /**
      * @param {number} type
-     * @param {DataReader} reader
+     * @param {import("armarius-io").IO} io
      * @protected
      * @returns {Promise<ExtraField>}
      */
-    async loadExtraField(type, reader) {
+    async loadExtraField(type, io) {
         switch (type) {
             case Constants.EXTRAFIELD_TYPE_ZIP64_EXTENDED_INFO:
-                return await Zip64ExtendedInformation.fromReader(reader);
+                return await Zip64ExtendedInformation.fromIO(io);
             case Constants.EXTRAFIELD_TYPE_UNICODE_FILENAME:
             case Constants.EXTRAFIELD_TYPE_UNICODE_COMMENT:
-                return await UnicodeExtraField.fromReader(reader);
+                return await UnicodeExtraField.fromIO(io);
             case Constants.EXTRAFIELD_TYPE_EXTENDED_TIMESTAMP:
-                return await ExtendedTimestamp.fromReader(reader);
+                return await ExtendedTimestamp.fromIO(io);
             default:
-                return await GenericExtraField.fromReader(reader);
+                return await GenericExtraField.fromIO(io);
         }
     }
 

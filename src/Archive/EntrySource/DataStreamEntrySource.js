@@ -1,21 +1,19 @@
 import EntrySource from "./EntrySource.js";
 import Constants from "../../Constants.js";
-import CRC32 from "../../Util/CRC32.js";
-import BigInt from "../../Util/BigInt.js";
 import OptionError from '../../Error/OptionError.js';
 
-export default class DataReaderEntrySource extends EntrySource {
-    /** @type {DataReader} */ reader;
+export default class DataStreamEntrySource extends EntrySource {
+    /** @type {import("armarius-io").DataStream} */ dataStream;
     /** @type {DataProcessor} */ compressor;
     /** @type {boolean} */ zip64;
     /** @type {number} */ compressedSize = 0;
     /** @type {boolean} */ eof = false;
 
     /**
-     * @param {DataReader} reader
+     * @param {import("armarius-io").DataStream} dataStream
      * @param {EntrySourceOptions|EntrySourceOptionsObject} options
      */
-    constructor(reader, options) {
+    constructor(dataStream, options) {
         if (!options.fileName) {
             throw new OptionError('Missing required fileName option');
         }
@@ -24,8 +22,8 @@ export default class DataReaderEntrySource extends EntrySource {
         }
         super(options);
 
-        this.reader = reader;
-        this.compressor = this.getDataProcessor(this.reader);
+        this.dataStream = dataStream;
+        this.compressor = this.getDataProcessor(this.dataStream);
         this.zip64 = this.options.forceZIP64;
     }
 
@@ -37,10 +35,10 @@ export default class DataReaderEntrySource extends EntrySource {
         let header = this.getBaseCentralDirectoryFileHeader();
         header.bitFlag = this.getBitFlag();
         header.crc32 = crc;
-        header.compressedSize = this.isZip64() ? Constants.MAX_UINT32 : this.compressedSize;
-        header.uncompressedSize = this.isZip64() ? Constants.MAX_UINT32 : this.reader.byteLength;
+        header.compressedSize = this.isZip64() ? Constants.MAX_UINT32 : Number(this.compressor.getPostLength());
+        header.uncompressedSize = this.isZip64() ? Constants.MAX_UINT32 : Number(this.compressor.getPreLength());
 
-        this.setCommonExtraFields(header, this.reader.byteLength, this.compressedSize, true);
+        this.setCommonExtraFields(header, this.compressor.getPreLength(), this.compressor.getPostLength(), true);
 
         return header;
     }
@@ -54,7 +52,6 @@ export default class DataReaderEntrySource extends EntrySource {
             this.eof = true;
             return new Uint8Array(0);
         }
-        this.compressedSize += compressed.byteLength;
         return compressed;
     }
 
@@ -64,8 +61,8 @@ export default class DataReaderEntrySource extends EntrySource {
     async generateDataDescriptor() {
         let descriptor = this.getBaseDataDescriptor();
         descriptor.crc32 = this.compressor.getPreCrc().finish();
-        descriptor.compressedSize = BigInt(this.compressedSize);
-        descriptor.uncompressedSize = BigInt(this.reader.byteLength);
+        descriptor.compressedSize = this.compressor.getPostLength();
+        descriptor.uncompressedSize = this.compressor.getPreLength();
 
         return descriptor;
     }
@@ -81,7 +78,9 @@ export default class DataReaderEntrySource extends EntrySource {
      * @inheritDoc
      */
     async generateLocalFileHeader() {
-        this.zip64 = this.zip64 || this.reader.byteLength > Constants.MAX_UINT32 ||
+        let dataLength = this.dataStream.getFinalLength();
+        // If the length is unknown, or if it's greater than 4GB, we need to use ZIP64
+        this.zip64 = this.zip64 || dataLength === null || dataLength > Constants.MAX_UINT32 ||
             this.getLocalHeaderOffset() > Constants.MAX_UINT32;
         if (this.zip64) {
             this.madeByVersion = Constants.MIN_VERSION_ZIP64;
@@ -91,10 +90,10 @@ export default class DataReaderEntrySource extends EntrySource {
         let header = this.getBaseLocalFileHeader();
         header.bitFlag = this.getBitFlag();
         header.crc32 = 0;
-        header.compressedSize = this.zip64 ? Constants.MAX_UINT32 : this.compressedSize;
-        header.uncompressedSize = this.zip64 ? Constants.MAX_UINT32 : this.reader.byteLength;
+        header.compressedSize = this.zip64 ? Constants.MAX_UINT32 : Number(this.compressor.getPostLength());
+        header.uncompressedSize = this.zip64 ? Constants.MAX_UINT32 : Number(this.compressor.getPreLength());
 
-        this.setCommonExtraFields(header, this.reader.byteLength, this.compressedSize, false);
+        this.setCommonExtraFields(header, this.compressor.getPreLength(), this.compressor.getPostLength(), false);
 
         return header;
     }

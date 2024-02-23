@@ -1,4 +1,4 @@
-import CRC32 from "../Util/CRC32.js";
+import {CRC32} from "armarius-io";
 import ArmariusError from '../Error/ArmariusError.js';
 const encoder = new TextEncoder();
 

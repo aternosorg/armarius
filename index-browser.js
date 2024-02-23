@@ -11,7 +11,7 @@ export { default as EntryIterator } from "./src/Archive/Entry/EntryIterator.js";
 export { default as EntryReference } from "./src/Archive/Entry/EntryReference.js";
 
 export { default as EntrySource } from "./src/Archive/EntrySource/EntrySource.js";
-export { default as DataReaderEntrySource } from "./src/Archive/EntrySource/DataReaderEntrySource.js";
+export { default as DataReaderEntrySource } from "./src/Archive/EntrySource/DataStreamEntrySource.js";
 export { default as DirectoryEntrySource } from "./src/Archive/EntrySource/DirectoryEntrySource.js";
 export { default as ArchiveEntryEntrySource } from "./src/Archive/EntrySource/ArchiveEntryEntrySource.js";
 

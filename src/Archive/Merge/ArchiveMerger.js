@@ -14,7 +14,7 @@ export default class ArchiveMerger {
     /** @type {DirectoryEntrySource[]} */ destinationPathFolders = [];
 
     /**
-     * @param {Array<ReadArchive, MergeSource>} archives
+     * @param {(ReadArchive|MergeSource)[]} archives
      * @param {MergeOptions|MergeOptionsObject} options
      */
     constructor(archives, options = {}) {

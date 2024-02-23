@@ -1,6 +1,6 @@
 import SignatureStructure from "./SignatureStructure.js";
 import Constants from "../../Constants.js";
-import BigInt from "../../Util/BigInt.js";
+import {BigInt} from 'armarius-io';
 
 export default class DataDescriptor extends SignatureStructure {
     /**

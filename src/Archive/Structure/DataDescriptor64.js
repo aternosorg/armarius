@@ -1,6 +1,6 @@
 import DataDescriptor from "./DataDescriptor.js";
 import Constants from "../../Constants.js";
-import BigIntUtils from "../../Util/BigIntUtils.js";
+import {BigIntUtils} from "armarius-io";
 
 export default class DataDescriptor64 extends DataDescriptor {
     /**

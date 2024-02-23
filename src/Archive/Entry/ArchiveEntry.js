@@ -7,8 +7,7 @@ import LocalFileHeader from '../Structure/LocalFileHeader.js';
 import EntryDataReader from './EntryDataReader.js';
 import MsDosTime from '../../Util/MsDosTime.js';
 import EntryOptions from '../../Options/EntryOptions.js';
-import BigInt from '../../Util/BigInt.js';
-import CRC32 from '../../Util/CRC32.js';
+import {BigInt, CRC32} from 'armarius-io';
 import FeatureError from '../../Error/FeatureError.js';
 import ArmariusError from '../../Error/ArmariusError.js';
 
@@ -51,13 +50,13 @@ export default class ArchiveEntry {
     }
 
     /**
-     * @param {DataReader} reader
+     * @param {import("armarius-io").IO} io
      * @param {number} centralDirectoryOffset
      * @returns {Promise<void>}
      */
-    async readCentralDirectoryHeader(reader, centralDirectoryOffset) {
+    async readCentralDirectoryHeader(io, centralDirectoryOffset) {
         this.centralDirectoryOffset = centralDirectoryOffset;
-        this.centralDirectoryFileHeader = await CentralDirectoryFileHeader.fromReader(reader);
+        this.centralDirectoryFileHeader = await CentralDirectoryFileHeader.fromIO(io);
         this.zip64ExtendedInformation = this.centralDirectoryFileHeader.getExtraField(Constants.EXTRAFIELD_TYPE_ZIP64_EXTENDED_INFO);
         this.unicodeFileName = this.centralDirectoryFileHeader.getExtraField(Constants.EXTRAFIELD_TYPE_UNICODE_FILENAME);
         this.unicodeFileComment = this.centralDirectoryFileHeader.getExtraField(Constants.EXTRAFIELD_TYPE_UNICODE_COMMENT);
@@ -73,7 +72,7 @@ export default class ArchiveEntry {
         }
         let localHeaderOffset = this.archive.prependedDataLength + Number(this.getLocalHeaderOffset());
         let reader = await this.archive.getReader(localHeaderOffset);
-        this.localFileHeader = await LocalFileHeader.fromReader(reader);
+        this.localFileHeader = await LocalFileHeader.fromIO(reader);
         this.dataOffset = localHeaderOffset + reader.offset;
     }
 
@@ -223,7 +222,7 @@ export default class ArchiveEntry {
     }
 
     /**
-     * @returns {Promise<DataReader>}
+     * @returns {Promise<import("armarius-io").IO>}
      */
     async getRawDataReader() {
         await this.readLocalFileHeader();
@@ -264,7 +263,7 @@ export default class ArchiveEntry {
 
     /**
      * @param {ReadArchive} archive
-     * @param {DataReader} centralDirectoryEntryReader
+     * @param {import("armarius-io").IO} centralDirectoryEntryReader
      * @param {number} centralDirectoryEntryOffset
      * @returns {Promise<ArchiveEntry>}
      */

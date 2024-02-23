@@ -9,8 +9,7 @@ export default class LocalFileHeader extends FileHeader {
     signature = Constants.SIGNATURE_LOCAL_FILE_HEADER;
 
     /**
-     * @param {DataReader} reader
-     * @returns {Promise<void>}
+     * @inheritDoc
      */
     async read(reader) {
         this.setSignature(await reader.getUint32());

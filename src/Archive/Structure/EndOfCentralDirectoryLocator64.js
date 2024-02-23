@@ -1,6 +1,6 @@
 import SignatureStructure from "./SignatureStructure.js";
 import Constants from "../../Constants.js";
-import BigIntUtils from "../../Util/BigIntUtils.js";
+import {BigIntUtils} from "armarius-io";
 
 /**
  * Zip64 end of central directory locator

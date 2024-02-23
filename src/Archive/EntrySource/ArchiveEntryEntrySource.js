@@ -4,7 +4,7 @@ import GenericExtraField from '../Structure/ExtraField/GenericExtraField.js';
 
 export default class ArchiveEntryEntrySource extends EntrySource {
     /** @type {ArchiveEntry} */ sourceEntry;
-    /** @type {DataReader} */ entryDataReader;
+    /** @type {import("armarius-io").IO} */ entryDataReader;
     /** @type {boolean} */ zip64;
 
     /**

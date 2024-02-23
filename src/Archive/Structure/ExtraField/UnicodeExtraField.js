@@ -22,8 +22,7 @@ export default class UnicodeExtraField extends ExtraField {
     data;
 
     /**
-     * @param {DataReader} reader
-     * @returns {Promise<void>}
+     * @inheritDoc
      */
     async read(reader) {
         await super.read(reader);

@@ -1,5 +1,5 @@
 import ExtraField from "./ExtraField.js";
-import BigIntUtils from "../../../Util/BigIntUtils.js";
+import {BigIntUtils} from "armarius-io";
 
 export default class Zip64ExtendedInformation extends ExtraField {
     /**
