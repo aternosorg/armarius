@@ -32,28 +32,8 @@ export { default as Zip64ExtendedInformation } from "./src/Archive/Structure/Ext
 export { default as ExtraField } from "./src/Archive/Structure/ExtraField/ExtraField.js";
 export { default as UnicodeExtraField } from "./src/Archive/Structure/ExtraField/UnicodeExtraField.js";
 
-export { default as DataReader } from "./src/Reader/DataReader.js";
-export { default as BufferedDataReader } from "./src/Reader/BufferedDataReader.js";
-export { default as BrowserFileReader } from "./src/Reader/BrowserFileReader.js";
-export { default as ArrayBufferReader } from "./src/Reader/ArrayBufferReader.js";
-
 export { default as CP437 } from "./src/Util/CP437.js";
-export { default as CRC32 } from "./src/Util/CRC32.js";
 export { default as MsDosTime } from "./src/Util/MsDosTime.js";
-export { default as BufferUtils } from "./src/Util/BufferUtils.js";
-
-export { default as DataProcessor } from "./src/DataProcessor/DataProcessor.js";
-export { default as AbstractDataProcessor } from "./src/DataProcessor/AbstractDataProcessor.js";
-export { default as FflateInflateDataProcessor } from "./src/DataProcessor/Fflate/FflateInflateDataProcessor.js";
-export { default as PassThroughDataProcessor } from "./src/DataProcessor/PassThroughDataProcessor.js";
-export { default as FflateDeflateDataProcessor } from "./src/DataProcessor/Fflate/FflateDeflateDataProcessor.js";
-export { default as FflateDataProcessor } from "./src/DataProcessor/Fflate/FflateDataProcessor.js";
-export { default as NativeDeflateDataProcessor } from "./src/DataProcessor/Native/NativeDeflateDataProcessor.js";
-export { default as NativeInflateDataProcessor } from "./src/DataProcessor/Native/NativeInflateDataProcessor.js";
-export { default as NativeStreamDataProcessor } from "./src/DataProcessor/Native/NativeStreamDataProcessor.js";
-export { default as FallbackDataProcessor } from "./src/DataProcessor/FallbackDataProcessor.js";
-export { default as DefaultInflateDataProcessor } from "./src/DataProcessor/DefaultInflateDataProcessor.js";
-export { default as DefaultDeflateDataProcessor } from "./src/DataProcessor/DefaultDeflateDataProcessor.js";
 
 export { default as Options } from "./src/Options/Options.js";
 export { default as EntrySourceOptions } from "./src/Options/EntrySourceOptions.js";

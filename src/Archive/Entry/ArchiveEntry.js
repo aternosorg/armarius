@@ -239,7 +239,8 @@ export default class ArchiveEntry {
         await this.readLocalFileHeader();
         return new EntryDataReader(
             await this.getDataProcessor(),
-            this.centralDirectoryFileHeader.crc32
+            this.centralDirectoryFileHeader.crc32,
+            Number(this.getUncompressedSize())
         );
     }
 
