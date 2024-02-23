@@ -49,7 +49,7 @@ export default class WriteArchive {
                 return null;
             }
             return res.value;
-        }
+        };
         return this;
     }
 
