@@ -34,11 +34,13 @@ export { default as UnicodeExtraField } from "./src/Archive/Structure/ExtraField
 
 export { default as CP437 } from "./src/Util/CP437.js";
 export { default as MsDosTime } from "./src/Util/MsDosTime.js";
+export { default as Resize } from "./src/Util/Resize.js";
 
 export { default as Options } from "./src/Options/Options.js";
 export { default as EntrySourceOptions } from "./src/Options/EntrySourceOptions.js";
 export { default as ReadArchiveOptions } from "./src/Options/ReadArchiveOptions.js";
 export { default as WriteArchiveOptions } from "./src/Options/WriteArchiveOptions.js";
+export { default as EntryDataReaderOptions } from "./src/Options/EntryDataReaderOptions.js";
 
 export { default as ArmariusError } from "./src/Error/ArmariusError.js";
 export { default as ChecksumError } from "./src/Error/ChecksumError.js";

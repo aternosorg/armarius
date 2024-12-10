@@ -55,7 +55,9 @@ export default class ReadArchive {
         this.prependedDataLength = 0;
 
         if(this.endOfCentralDirectoryRecord.diskNumber !== 0 || this.endOfCentralDirectoryRecord.centralDirectoryDiskNumber !== 0) {
-            throw new FeatureError('Multi disk archives are not supported');
+            if (!this.options.ignoreMultiDiskErrors) {
+                throw new FeatureError('Multi disk archives are not supported');
+            }
         }
 
         /*
@@ -134,7 +136,7 @@ export default class ReadArchive {
         );
         this.endOfCentralDirectoryLocator64 = await EndOfCentralDirectoryLocator64.fromIO(endOfDirectoryLocatorReader);
 
-        if(this.endOfCentralDirectoryLocator64.disks > 1) {
+        if(this.endOfCentralDirectoryLocator64.disks > 1 && !this.options.ignoreMultiDiskErrors) {
             throw new FeatureError('Multi disk archives are not supported');
         }
 
@@ -167,7 +169,10 @@ export default class ReadArchive {
 
         if(this.endOfCentralDirectoryRecord64.diskNumber !== 0 ||
             this.endOfCentralDirectoryRecord64.centralDirectoryDiskNumber !== 0) {
-            throw new FeatureError('Multi disk archives are not supported');
+
+            if (!this.options.ignoreMultiDiskErrors) {
+                throw new FeatureError('Multi disk archives are not supported');
+            }
         }
 
         this.centralDirectoryByteLength = Number(this.endOfCentralDirectoryRecord64.centralDirectorySize);

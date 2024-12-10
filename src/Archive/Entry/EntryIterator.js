@@ -1,10 +1,12 @@
 import ArchiveIndex from "../../Index/ArchiveIndex.js";
 import ArchiveEntry from "./ArchiveEntry.js";
 import {BigInt} from 'armarius-io';
+import ZipError from '../../Error/ZipError.js';
 
 export default class EntryIterator {
     /** @type {ReadArchive} */ archive;
     /** @type {BigInt} */ entryCount;
+    /** @type {BigInt} */ size;
     /** @type {number} */ startOffset;
     /** @type {BigInt} */ currentEntry;
     /** @type {import("armarius-io").IO} */ io;
@@ -22,6 +24,7 @@ export default class EntryIterator {
         this.createIndex = createIndex;
         this.startOffset = io.offset;
         this.entryCount = archive.getCentralDirectoryEntryCount();
+        this.size = archive.getCentralDirectorySize();
         this.reset();
     }
 
@@ -51,6 +54,12 @@ export default class EntryIterator {
      */
     async next() {
         if (this.currentEntry >= this.entryCount) {
+            return null;
+        }
+        if (this.io.offset >= BigInt(this.startOffset) + this.size) {
+            if (!this.archive.options.allowTruncatedCentralDirectory) {
+                throw new ZipError("Reached end of central directory data before all entries were read");
+            }
             return null;
         }
         let offset = this.io.offset;

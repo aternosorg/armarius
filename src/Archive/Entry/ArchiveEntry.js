@@ -10,6 +10,8 @@ import EntryOptions from '../../Options/EntryOptions.js';
 import {BigInt, CRC32} from 'armarius-io';
 import FeatureError from '../../Error/FeatureError.js';
 import ArmariusError from '../../Error/ArmariusError.js';
+import ZipError from '../../Error/ZipError.js';
+import Resize from '../../Util/Resize.js';
 
 const decoder = new TextDecoder();
 
@@ -230,9 +232,10 @@ export default class ArchiveEntry {
     }
 
     /**
+     * @param {EntryDataReaderOptions|EntryDataReaderOptionsObject} options
      * @returns {Promise<EntryDataReader>}
      */
-    async getDataReader() {
+    async getDataReader(options = {}) {
         if (this.isDirectory()) {
             throw new ArmariusError(`Cannot create data reader: ${this.getFileNameString()} is a directory`);
         }
@@ -240,25 +243,39 @@ export default class ArchiveEntry {
         return new EntryDataReader(
             await this.getDataProcessor(),
             this.centralDirectoryFileHeader.crc32,
-            Number(this.getUncompressedSize())
+            Number(this.getUncompressedSize()),
+            options
         );
     }
 
     /**
      * @param {number} chunkSize
+     * @param {EntryDataReaderOptions|EntryDataReaderOptionsObject} options
      * @returns {Promise<Uint8Array>}
      */
-    async getData(chunkSize = 1024 * 64) {
+    async getData(chunkSize = 1024 * 64, options = {}) {
         let res = new Uint8Array(Number(this.getUncompressedSize()));
         let offset = 0;
-        let reader = await this.getDataReader();
+        let reader = await this.getDataReader(options);
 
         let chunk;
         while ((chunk = await reader.read(chunkSize)) !== null) {
+            if (offset + chunk.byteLength > res.byteLength) {
+                if (!options.ignoreInvalidUncompressedSize) {
+                    throw new ZipError(`Data size exceeds expected uncompressed size.`);
+                }
+                res = Resize.resizeBuffer(res, res.byteLength + chunkSize * 8);
+            }
             res.set(chunk, offset);
             offset += chunk.byteLength;
         }
 
+        if (offset < res.byteLength) {
+            if (!options.ignoreInvalidUncompressedSize) {
+                throw new ZipError(`Data size is less than expected uncompressed size.`);
+            }
+            return new Uint8Array(res.buffer, res.byteOffset, offset);
+        }
         return res;
     }
 

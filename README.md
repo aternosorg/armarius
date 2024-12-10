@@ -58,11 +58,13 @@ await archive.init();
 The ReadArchive constructor optionally accepts an [ReadArchiveOptions](src/Options/ReadArchiveOptions.js) object with
 the following properties:
 
-| Name                         | Type                                        | Description                                                                                                                                                                  |
-|------------------------------|---------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `centralDirectoryBufferSize` | number                                      | Buffer size used when reading central directory contents.<br/>Larger buffer sizes may improve performance, but also increase RAM usage.                                      |
-| `createEntryIndex`           | boolean                                     | Whether an index of all central directory entries should be created the first time they are read.<br/>Massively increases performance when using `findEntry` multiple times. |
-| `entryOptions`               | [EntryOptions](src/Options/EntryOptions.js) | Options passed to each created Entry object.                                                                                                                                 |
+| Name                             | Type                                        | Description                                                                                                                                                                  |
+|----------------------------------|---------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `centralDirectoryBufferSize`     | number                                      | Buffer size used when reading central directory contents.<br/>Larger buffer sizes may improve performance, but also increase RAM usage.                                      |
+| `createEntryIndex`               | boolean                                     | Whether an index of all central directory entries should be created the first time they are read.<br/>Massively increases performance when using `findEntry` multiple times. |
+| `entryOptions`                   | [EntryOptions](src/Options/EntryOptions.js) | Options passed to each created Entry object.                                                                                                                                 |
+| `ignoreMultiDiskErrors`          | boolean                                     | Simply ignore information about multiple disks instead of throwing an error when encountering a multi disk archive                                                           |
+| `allowTruncatedCentralDirectory` | boolean                                     | Do not throw an error if the central directory does not contain the expected numbber of entries                                                                              |
 
 [EntryOptions](src/Options/EntryOptions.js) can have the following properties:
 
@@ -132,6 +134,14 @@ file. Since this data is decompressed, the size of the returned chunk might diff
 
 Also note that an empty chunk returned from `EntryDataReader.read` does not necessarily indicate that all data has been read.
 After all data was read, `null` will be returned instead.
+
+Both `getDataReader` and `getData` optionally accept an [EntryDataReaderOptions](src/Options/EntryDataReaderOptions.js) object with
+the following properties:
+
+| Name                            | Type    | Description                                                                     |
+|---------------------------------|---------|---------------------------------------------------------------------------------|
+| `ignoreInvalidChecksums`        | boolean | Do not throw an error if the uncompressed data does not match the checksum      |
+| `ignoreInvalidUncompressedSize` | boolean | Do not throw an error if the uncompressed data does not match the expected size |
 
 ### Writing archives
 
