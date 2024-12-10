@@ -8,6 +8,7 @@ import Constants from '../Constants.js';
  * @property {EntryOptions|EntryOptionsObject} [entryOptions]
  * @property {boolean} [ignoreMultiDiskErrors]
  * @property {boolean} [allowTruncatedCentralDirectory]
+ * @property {boolean} [allowAdditionalCentralDirectoryEntries]
  */
 
 
@@ -17,5 +18,6 @@ export default class ReadArchiveOptions extends Options {
     /** @type {EntryOptions|EntryOptionsObject} */ entryOptions = {};
     /** @type {boolean} */ ignoreMultiDiskErrors = false;
     /** @type {boolean} */ allowTruncatedCentralDirectory = false;
+    /** @type {boolean} */ allowAdditionalCentralDirectoryEntries = false;
 }
 

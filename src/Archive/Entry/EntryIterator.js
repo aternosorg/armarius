@@ -54,7 +54,9 @@ export default class EntryIterator {
      */
     async next() {
         if (this.currentEntry >= this.entryCount) {
-            return null;
+            if (!this.archive.options.allowAdditionalCentralDirectoryEntries || this.io.offset >= BigInt(this.startOffset) + this.size) {
+                return null;
+            }
         }
         if (this.io.offset >= BigInt(this.startOffset) + this.size) {
             if (!this.archive.options.allowTruncatedCentralDirectory) {
