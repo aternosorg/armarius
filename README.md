@@ -64,7 +64,7 @@ the following properties:
 | `createEntryIndex`               | boolean                                     | Whether an index of all central directory entries should be created the first time they are read.<br/>Massively increases performance when using `findEntry` multiple times. |
 | `entryOptions`                   | [EntryOptions](src/Options/EntryOptions.js) | Options passed to each created Entry object.                                                                                                                                 |
 | `ignoreMultiDiskErrors`          | boolean                                     | Simply ignore information about multiple disks instead of throwing an error when encountering a multi disk archive                                                           |
-| `allowTruncatedCentralDirectory` | boolean                                     | Do not throw an error if the central directory does not contain the expected numbber of entries                                                                              |
+| `allowTruncatedCentralDirectory` | boolean                                     | Do not throw an error if the central directory does not contain the expected number of entries                                                                               |
 
 [EntryOptions](src/Options/EntryOptions.js) can have the following properties:
 
