@@ -83,11 +83,11 @@ export default class ReadArchive {
         If there are entries in the central directory, we can check whether we are at the correct location by looking
         at the signature of the first entry.
          */
-        if (this.centralDirectoryEntryCount > 0) {
+        if (this.centralDirectoryByteLength > 0) {
             let possibleCentralDirectoryOffset;
-            if(this.isZip64) {
+            if (this.isZip64) {
                 possibleCentralDirectoryOffset = this.endOfCentralDirectoryOffset64 - this.centralDirectoryByteLength;
-            }else {
+            } else {
                 possibleCentralDirectoryOffset = this.endOfCentralDirectoryOffset - this.centralDirectoryByteLength;
             }
 
