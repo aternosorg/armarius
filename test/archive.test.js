@@ -2,7 +2,7 @@ import {
     ArchiveEntry,
     ArchiveMerger,
     Constants,
-    DataReaderEntrySource, ExtendedTimestamp,
+    DataReaderEntrySource, DirectoryEntrySource, ExtendedTimestamp,
     ReadArchive,
     WriteArchive
 } from '../index.js';
@@ -201,4 +201,24 @@ test('Clone entry iterator', async () => {
 
     let clone = await entryIterator.clone();
     expect((await entryIterator.next()).getFileNameString()).toBe((await clone.next()).getFileNameString());
+});
+
+test('Empty directories', async () => {
+    let archive = new WriteArchive((function *() {
+        for(let i = 0; i < 10; i++) {
+            yield new DirectoryEntrySource({
+                fileName: `dir-${i}`,
+            })
+        }
+    })());
+    let data = await writeArchiveToBuffer(archive);
+
+    let readArchive = new ReadArchive(new ArrayBufferIO(data.buffer, data.byteOffset, data.byteLength));
+    await readArchive.init();
+
+    let entries = await readArchive.getAllEntries();
+    expect(entries.length).toBe(10);
+    let entry = entries.shift();
+    expect(entry.getFileNameString()).toBe('dir-0/');
+    expect(entry.isDirectory()).toBe(true);
 });

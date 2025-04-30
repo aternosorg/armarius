@@ -9,9 +9,11 @@ defaultDataProcessors.set(Constants.COMPRESSION_METHOD_DEFLATE, DefaultInflateDa
 /**
  * @typedef {Object} EntryOptionsObject
  * @property {Map<number, typeof import("armarius-io").DataProcessor>} [dataProcessors]
+ * @property {boolean} [allowTrailingSlashInFileName]
  */
 
 export default class EntryOptions extends Options {
     /** @type {Map<number, typeof import("armarius-io").DataProcessor>} */ dataProcessors = defaultDataProcessors;
+    /** @type {boolean} */ allowTrailingSlashInFileName = false;
 }
 

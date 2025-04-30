@@ -69,9 +69,10 @@ the following properties:
 
 [EntryOptions](src/Options/EntryOptions.js) can have the following properties:
 
-| Name              | Type                              | Description                                                                                       |
-|-------------------|-----------------------------------|---------------------------------------------------------------------------------------------------|
-| `dataProcessors`  | Map<number, typeof DataProcessor> | Map of compressionMethod => DataProcessor<br/>Can be used to implement custom compression methods |
+| Name                           | Type                              | Description                                                                                       |
+|--------------------------------|-----------------------------------|---------------------------------------------------------------------------------------------------|
+| `dataProcessors`               | Map<number, typeof DataProcessor> | Map of compressionMethod => DataProcessor<br/>Can be used to implement custom compression methods |
+| `allowTrailingSlashInFileName` | boolean                           | Interpret entries with non-empty data as files, even if the file name ends on `/`.                |
 
 #### Reading all archive entries
 

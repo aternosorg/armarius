@@ -200,8 +200,14 @@ export default class ArchiveEntry {
      * @returns {boolean}
      */
     isDirectory() {
-        return ((this.centralDirectoryFileHeader.bitFlag & 0xff) & Constants.BITFLAG_MSDOS_DIR) === Constants.BITFLAG_MSDOS_DIR ||
-            this.getFileNameString().endsWith('/');
+        if (((this.centralDirectoryFileHeader.bitFlag & 0xff) & Constants.BITFLAG_MSDOS_DIR) === Constants.BITFLAG_MSDOS_DIR) {
+            return true;
+        }
+        if (this.options.allowTrailingSlashInFileName && this.centralDirectoryFileHeader.compressedSize > 0) {
+            return false;
+        }
+
+        return this.getFileNameString().endsWith('/');
     }
 
     /**
