@@ -12,7 +12,6 @@ export default class WriteArchive {
     /** @type {boolean} */ localHeaderWritten;
     /** @type {boolean} */ centralHeadersWritten = false;
     /** @type {boolean} */ endWritten = false;
-    /** @type {Function} */ nextEntryFunction;
     /** @type {?number} */ centralDirOffset = null;
     /** @type {Uint8Array[]} */ centralDirHeaders = [];
     /** @type {number} */ centralDirEntryCount = 0;
@@ -21,43 +20,32 @@ export default class WriteArchive {
     /** @type {number} */ extractionVersion = Constants.MIN_VERSION_DEFLATE;
     /** @type {boolean} */ zip64 = false;
     /** @type {number} */ bytesWritten = 0;
+    /** @type {AsyncGenerator<EntrySource>} */ entryGenerator;
 
     /**
-     * @param {(() => Promise<EntrySource|null>)|Generator<EntrySource>|AsyncGenerator<EntrySource>} nextEntryFunction
+     * @param {(() => Promise<EntrySource|null>)|Generator<EntrySource>|AsyncGenerator<EntrySource>} entryGenerator
      * @param {WriteArchiveOptions|WriteArchiveOptionsObject} options
      */
-    constructor(nextEntryFunction, options = {}) {
-        this.setNextEntryFunction(nextEntryFunction);
+    constructor(entryGenerator, options = {}) {
         this.options = WriteArchiveOptions.from(options);
-
         this.zip64 = this.options.forceZIP64;
-    }
 
-    /**
-     * @param {(() => Promise<EntrySource|null>)|Generator<EntrySource>|AsyncGenerator<EntrySource>} fn
-     * @returns {this}
-     */
-    setNextEntryFunction(fn) {
-        if(typeof fn.next !== 'function') {
-            this.nextEntryFunction = fn;
-            return this;
+        if (entryGenerator.next) {
+            this.entryGenerator = entryGenerator;
+        } else {
+            this.entryGenerator = this.generateEntriesFromFunction(entryGenerator);
         }
-
-        this.nextEntryFunction = async () => {
-            let res = await fn.next();
-            if(res.done) {
-                return null;
-            }
-            return res.value;
-        };
-        return this;
     }
 
     /**
-     * @returns {Function}
+     * @param {function(): Promise<EntrySource>} fn
+     * @returns {AsyncGenerator<EntrySource>}
      */
-    getNextEntryFunction() {
-        return this.nextEntryFunction;
+    async *generateEntriesFromFunction(fn) {
+        let entry;
+        while (entry = await fn()) {
+            yield entry;
+        }
     }
 
     /**
@@ -65,9 +53,12 @@ export default class WriteArchive {
      * @returns {Promise<void>}
      */
     async nextEntry() {
-        this.currentEntrySource = await this.nextEntryFunction();
-        if (!this.currentEntrySource) {
+        let next = await this.entryGenerator.next();
+        if (next.done) {
+            this.currentEntrySource = null;
             this.endOfArchive = true;
+        } else {
+            this.currentEntrySource = next.value;
         }
         this.localHeaderWritten = false;
     }
@@ -285,5 +276,20 @@ export default class WriteArchive {
             return null;
         }
         return this.centralDirEntryCount;
+    }
+
+    /**
+     * Write the archive to an IO instance. The IO instance must support writing.
+     *
+     * @param {import("armarius-io").IO} io
+     * @param {?AbortSignal} abortSignal
+     * @return {Promise<void>}
+     */
+    async writeTo(io, abortSignal = null) {
+        let chunk;
+        while (chunk = await this.getNextChunk()) {
+            await io.write(chunk);
+            abortSignal?.throwIfAborted();
+        }
     }
 }

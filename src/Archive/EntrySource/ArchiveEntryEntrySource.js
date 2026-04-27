@@ -1,6 +1,7 @@
 import EntrySource from './EntrySource.js';
 import Constants from '../../Constants.js';
 import GenericExtraField from '../Structure/ExtraField/GenericExtraField.js';
+import {symbols} from 'armarius-io';
 
 export default class ArchiveEntryEntrySource extends EntrySource {
     /** @type {ArchiveEntry} */ sourceEntry;
@@ -149,6 +150,12 @@ export default class ArchiveEntryEntrySource extends EntrySource {
      */
     isZip64() {
         return super.isZip64() || this.zip64;
+    }
+
+    async [symbols.asyncDispose] () {
+        if (this.entryDataReader) {
+            await this.entryDataReader[symbols.asyncDispose]();
+        }
     }
 }
 

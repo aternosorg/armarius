@@ -219,7 +219,7 @@ export default class ArchiveEntry {
 
     /**
      * @protected
-     * @returns {Promise<DataProcessor>}
+     * @returns {Promise<import("armarius-io").DataProcessor>}
      */
     async getDataProcessor() {
         let Processor = this.options.dataProcessors.get(this.centralDirectoryFileHeader.compressionMethod);

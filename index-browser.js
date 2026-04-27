@@ -7,7 +7,9 @@ export { default as MergeSource } from "./src/Archive/Merge/MergeSource.js";
 
 export { default as ArchiveEntry } from "./src/Archive/Entry/ArchiveEntry.js";
 export { default as EntryDataReader } from "./src/Archive/Entry/EntryDataReader.js";
+export { default as EntryIteratorInterface } from "./src/Archive/Entry/EntryIteratorInterface.js";
 export { default as EntryIterator } from "./src/Archive/Entry/EntryIterator.js";
+export { default as AsyncSafeEntryIterator } from "./src/Archive/Entry/AsyncSafeEntryIterator.js";
 export { default as EntryReference } from "./src/Archive/Entry/EntryReference.js";
 
 export { default as EntrySource } from "./src/Archive/EntrySource/EntrySource.js";
@@ -35,6 +37,9 @@ export { default as UnicodeExtraField } from "./src/Archive/Structure/ExtraField
 export { default as CP437 } from "./src/Util/CP437.js";
 export { default as MsDosTime } from "./src/Util/MsDosTime.js";
 export { default as Resize } from "./src/Util/Resize.js";
+export { default as Packer } from "./src/Util/Packer.js";
+export { default as Extractor } from "./src/Util/Extractor.js";
+export { default as Verifier } from "./src/Util/Verifier.js";
 
 export { default as Options } from "./src/Options/Options.js";
 export { default as EntrySourceOptions } from "./src/Options/EntrySourceOptions.js";

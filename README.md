@@ -37,6 +37,35 @@ but are not officially supported.
 
 ## Usage
 
+### Extracting, packing, and verifying ZIP archives
+
+#### Simple usage (Node.js only)
+
+Since browsers do not have access to a normal file system, these functions are only available in Node.js environments. 
+In web browsers, the advanced usage examples below can be used to achieve the same functionality with a custom file system implementation.
+
+```javascript
+import {extract, pack, verify} from 'armarius';
+
+await extract("./path/to/archive.zip", "./path/to/target/dir");
+
+await pack("./path/to/source/dir", "./path/to/target.zip");
+
+// Will throw an error if the archive is invalid
+await verify("./path/to/archive.zip");
+```
+
+Each function accepts an additional options object with more fine-grained control over the operation.
+See [node-utils.js](src/Util/node-utils.js) for more details.
+
+#### Advanced usage (Node.js and web browsers)
+
+The above operations can also be performed using the Extractor, Packer, and Verifier classes, which give finer control
+over the operation and allow using custom IO and file system implementations.
+
+The above helper functions can be used as a reference for how to use these classes to achieve the same functionality.
+See [node-utils.js](src/Util/node-utils.js) for more details.
+
 ### Reading a ZIP archive
 
 To read an archive, an [IO context](https://github.com/aternosorg/armarius-io/blob/master/src/IO/IO.js) is required. 

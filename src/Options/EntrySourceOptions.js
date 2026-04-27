@@ -23,7 +23,7 @@ defaultDataProcessors.set(Constants.COMPRESSION_METHOD_DEFLATE, DefaultDeflateDa
  * @property {?string} [fileName]
  * @property {number} [internalFileAttributes]
  * @property {number} [externalFileAttributes]
- * @property {Map<number, typeof DataProcessor>} [dataProcessors]
+ * @property {Map<number, typeof import("armarius-io").DataProcessor>} [dataProcessors]
  */
 
 
@@ -43,6 +43,6 @@ export default class EntrySourceOptions extends Options {
     /** @type {?string} */ fileName = null;
     /** @type {number} */ internalFileAttributes = 0;
     /** @type {number} */ externalFileAttributes = 0;
-    /** @type {Map<number, typeof DataProcessor>} */ dataProcessors = defaultDataProcessors;
+    /** @type {Map<number, typeof import("armarius-io").DataProcessor>} */ dataProcessors = defaultDataProcessors;
 }
 

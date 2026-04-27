@@ -2,8 +2,9 @@ import ArchiveIndex from "../../Index/ArchiveIndex.js";
 import ArchiveEntry from "./ArchiveEntry.js";
 import {BigInt} from 'armarius-io';
 import ZipError from '../../Error/ZipError.js';
+import EntryIteratorInterface from './EntryIteratorInterface.js';
 
-export default class EntryIterator {
+export default class EntryIterator extends EntryIteratorInterface {
     /** @type {ReadArchive} */ archive;
     /** @type {BigInt} */ entryCount;
     /** @type {BigInt} */ size;
@@ -19,6 +20,7 @@ export default class EntryIterator {
      * @param {boolean} createIndex
      */
     constructor(archive, io, createIndex = true) {
+        super();
         this.archive = archive;
         this.io = io;
         this.createIndex = createIndex;

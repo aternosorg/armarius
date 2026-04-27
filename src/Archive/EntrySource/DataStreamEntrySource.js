@@ -1,10 +1,11 @@
 import EntrySource from "./EntrySource.js";
 import Constants from "../../Constants.js";
 import OptionError from '../../Error/OptionError.js';
+import {symbols} from 'armarius-io';
 
 export default class DataStreamEntrySource extends EntrySource {
     /** @type {import("armarius-io").DataStream} */ dataStream;
-    /** @type {DataProcessor} */ compressor;
+    /** @type {import("armarius-io").DataProcessor} */ compressor;
     /** @type {boolean} */ zip64;
     /** @type {number} */ compressedSize = 0;
     /** @type {boolean} */ eof = false;
@@ -110,6 +111,10 @@ export default class DataStreamEntrySource extends EntrySource {
      */
     isZip64() {
         return this.zip64;
+    }
+
+    async [symbols.asyncDispose] () {
+        await this.dataStream[symbols.asyncDispose]();
     }
 }
 
