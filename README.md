@@ -72,7 +72,7 @@ To read an archive, an [IO context](https://github.com/aternosorg/armarius-io/bl
 The `armarius-io` library provides IO implementations for `Blob`, `ArrayBuffer`, and Node.js `FileHandle`
 objects. Other IO contexts can be implemented by extending the [IO](https://github.com/aternosorg/armarius-io/blob/master/src/IO/IO.js) class.
 
-While not all IO contexts need manual resource management, it is recommended to always them at the end of their usage, 
+While not all IO contexts need manual resource management, it is recommended to always close them at the end of their usage, 
 either by using `await using`, or by calling `io[Symbol.asyncDispose]()`.
 
 ```javascript
