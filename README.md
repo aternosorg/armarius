@@ -42,7 +42,7 @@ but are not officially supported.
 #### Simple usage (Node.js only)
 
 Since browsers do not have access to a normal file system, these functions are only available in Node.js environments. 
-In web browsers, the advanced usage examples below can be used to achieve the same functionality with a custom file system implementation.
+In web browsers, the advanced usage below can be used to achieve the same functionality with a custom file system implementation.
 
 ```javascript
 import {extract, pack, verify} from 'armarius';
