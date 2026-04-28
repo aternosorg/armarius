@@ -7,8 +7,8 @@
   "main": "index.js",
   "browser": "index-browser.js",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testTimeout 120000",
-    "coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --rootDir test --testTimeout 120000",
+    "coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --rootDir test --coverage --testTimeout 120000",
     "lint": "eslint src/**"
   },
   "keywords": [],
