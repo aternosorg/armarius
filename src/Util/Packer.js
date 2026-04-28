@@ -1,9 +1,10 @@
-import EntrySourceOptions from "../Options/EntrySourceOptions.js";
-import {symbols, Path} from "armarius-io";
-import WriteArchiveOptions from "../Options/WriteArchiveOptions.js";
+import EntrySourceOptions from '../Options/EntrySourceOptions.js';
+import {Path, symbols} from 'armarius-io';
+import WriteArchiveOptions from '../Options/WriteArchiveOptions.js';
 import DirectoryEntrySource from '../Archive/EntrySource/DirectoryEntrySource.js';
 import DataStreamEntrySource from '../Archive/EntrySource/DataStreamEntrySource.js';
 import WriteArchive from '../Archive/WriteArchive.js';
+import WriteArchiveStream from '../Archive/WriteArchiveStream.js';
 
 export default class Packer {
     /** @type {EntrySourceOptions} */ entrySourceOptions;
@@ -76,5 +77,15 @@ export default class Packer {
             await generator.return(null);
         }
         return this;
+    }
+
+    /**
+     * @param {import("armarius-io").FileHandleInterface} directory
+     * @returns {Promise<WriteArchiveStream>}
+     */
+    async packToStream(directory) {
+        let generator = this.generateEntries(directory);
+        let archive = new WriteArchive(generator, this.writeArchiveOptions);
+        return new WriteArchiveStream(archive, async () => await generator.return(null));
     }
 }

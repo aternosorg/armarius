@@ -3,7 +3,7 @@ import * as os from "node:os";
 import fs from "node:fs";
 import * as pathModule from "node:path";
 import {pathToFileURL} from "node:url";
-import {NodeFileHandle, NodeFileIO, symbols} from "armarius-io";
+import {ArrayBufferIO, NodeFileHandle, NodeFileIO, symbols} from 'armarius-io';
 import Packer from "../src/Util/Packer.js";
 import TrackingFileHandle from "./util/TrackingFileHandle.js";
 import TrackingContext from "./util/TrackingContext.js";
@@ -32,6 +32,26 @@ test("Pack directory", async () => {
 
     await using archiveIO = await NodeFileIO.open(new URL("output1.zip", tempDir), 'r');
     let archive = new ReadArchive(archiveIO);
+    await archive.init();
+
+    let entries = await archive.getAllEntries();
+    expect(entries.length).toBe(4);
+    let names = entries.map(e => e.getFileNameString()).sort();
+    expect(names).toEqual(['dir/', 'dir/empty_subdir/', 'dir/file2.txt', 'file.txt']);
+});
+
+test("Pack directory to ReadbaleStream", async () => {
+    let dir = new NodeFileHandle(new URL("fixtures/base/", import.meta.url));
+    let stream = await new Packer().packToStream(dir);
+
+    let chunks = [];
+    for await (let chunk of stream) {
+        chunks.push(chunk);
+    }
+
+    let archiveData = Buffer.concat(chunks);
+    await using io = new ArrayBufferIO(archiveData.buffer, archiveData.byteOffset, archiveData.byteLength);
+    let archive = new ReadArchive(io);
     await archive.init();
 
     let entries = await archive.getAllEntries();

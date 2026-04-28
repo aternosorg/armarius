@@ -1,5 +1,6 @@
 export { default as ReadArchive } from "./src/Archive/ReadArchive.js";
 export { default as WriteArchive } from "./src/Archive/WriteArchive.js";
+export { default as WriteArchiveStream } from "./src/Archive/WriteArchiveStream.js";
 export { default as ArchiveIndex } from "./src/Index/ArchiveIndex.js";
 
 export { default as ArchiveMerger } from "./src/Archive/Merge/ArchiveMerger.js";

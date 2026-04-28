@@ -76,6 +76,18 @@ export default class WriteArchive {
     }
 
     /**
+     * Get an async generator that yields the archive data in chunks.
+     * @param {number} readSize
+     * @returns {AsyncGenerator<Uint8Array<ArrayBufferLike>>}
+     */
+    async *getData(readSize = Constants.DEFAULT_CHUNK_SIZE) {
+        let chunk;
+        while (chunk = await this.getNextChunk(readSize)) {
+            yield chunk;
+        }
+    }
+
+    /**
      * @param {number} readSize
      * @protected
      * @returns {Promise<?Uint8Array>}
