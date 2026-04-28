@@ -2,7 +2,7 @@
 
 ## About
 
-Armarius is a JavaScript library to read, write, and merge ZIP archives in web browsers.
+Armarius is a JavaScript library to read, write, and merge ZIP archives in web browsers and Node.js.
 
 This library mainly focuses on a low memory footprint, especially when reading archives with tens of thousands of
 entries, and the ability to merge archives without decompressing and recompressing all entries.
