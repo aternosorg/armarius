@@ -72,9 +72,12 @@ To read an archive, an [IO context](https://github.com/aternosorg/armarius-io/bl
 The `armarius-io` library provides IO implementations for `Blob`, `ArrayBuffer`, and Node.js `FileHandle`
 objects. Other IO contexts can be implemented by extending the [IO](https://github.com/aternosorg/armarius-io/blob/master/src/IO/IO.js) class.
 
+While not all IO contexts need manual resource management, it is recommended to always them at the end of their usage, 
+either by using `await using`, or by calling `io[Symbol.asyncDispose]()`.
+
 ```javascript
 let fileInput = document.getElementById('file-input');
-let reader = new io.BlobIO(fileInput.files[0]);
+await using reader = new io.BlobIO(fileInput.files[0]);
 ```
 
 A [ReadArchive](src/Archive/ReadArchive.js) can then be created from an IO context.
@@ -188,13 +191,17 @@ Additionally, a [WriteArchiveOptions](src/Options/WriteArchiveOptions.js) object
 
 ```javascript
 async function *generateNextEntrySource() {
-    yield new armarius.DataStreamEntrySource(new io.ArrayBufferIO(new ArrayBuffer(0)), {fileName: 'file.txt'});
-    yield new armarius.DataStreamEntrySource(new io.ArrayBufferIO(new ArrayBuffer(0)), {fileName: 'file2.txt'});
-    return null;
+    for (let i = 0; i < 10; i++) {
+        await using entrySource = new armarius.DataStreamEntrySource(new io.ArrayBufferIO(new ArrayBuffer(0)), {fileName: `file-${i}.txt`});
+        yield entrySource;
+    }
 }
 
 let writeArchive = new armarius.WriteArchive(generateNextEntrySource(), options);
 ```
+
+The entry source generator is also responsible for disposing of used entry sources if necessary.
+The above example uses `await using` to automatically dispose of each generated entry source after it was used.
 
 #### Generating entries
 
@@ -208,13 +215,13 @@ This simple example will generate an archive that contains 10 text files:
 ```javascript
 let encoder = new TextEncoder();
 
-function *generateEntrySources() {
+async function *generateEntrySources() {
     for (let i = 0; i < 10; i++) {
         let fileName = `file-${i}`;
         let fileContent = encoder.encode(`Content of file ${i}`);
 
-        let reader = new io.ArrayBufferIO(fileContent.buffer, fileContent.byteOffset, fileContent.byteLength);
-        let entry = new armarius.DataStreamEntrySource(reader, {fileName: fileName});
+        await using reader = new io.ArrayBufferIO(fileContent.buffer, fileContent.byteOffset, fileContent.byteLength);
+        await using entry = new armarius.DataStreamEntrySource(reader, {fileName: fileName});
         yield entry;
     }
 }
@@ -253,6 +260,15 @@ let chunk;
 while (chunk = await writeArchive.getNextChunk()) {
     console.log('New archive chunk:', chunk);
 }
+```
+
+It can also be written directly to an IO object.
+
+```javascript
+import {NodeFileIO} from 'armarius-io';
+
+await using io = NodeFileIO.open('path/to/archive.zip', 'w');
+await writeArchive.writeTo(io);
 ```
 
 ### Merging ZIP archives
@@ -305,12 +321,11 @@ mergeSource
 While mainly intended for use in web browsers, this library can also be used in Node.js.
 
 To read data from files, a [NodeFileIO](https://github.com/aternosorg/armarius-io/blob/master/src/IO/NodeFileIO.js) object can be used:
-```javascript
-import * as fs from 'node:fs';
 
-let file = await fs.promises.open('path/to/file.zip', 'r');
-let stat = await file.stat();
-let reader = new io.NodeFileIO(file, 0, stat.size);
+```javascript
+import {NodeFileIO} from 'armarius-io';
+
+await using io = await NodeFileIO.open('path/to/file.zip', 'r');
 ```
 
 Armarius will automatically recognize that it is running in a Node.js environment and use the appropriate 
