@@ -66,10 +66,11 @@ export default class Packer {
      * @param {import("armarius-io").FileHandleInterface} directory
      * @param {import("armarius-io").IO} output
      * @param {?AbortSignal} abortSignal
+     * @param {string} basePath
      * @returns {Promise<this>}
      */
-    async pack(directory, output, abortSignal = null) {
-        let generator = this.generateEntries(directory);
+    async pack(directory, output, abortSignal = null, basePath = '') {
+        let generator = this.generateEntries(directory, basePath);
         let archive = new WriteArchive(generator, this.writeArchiveOptions);
         try {
             await archive.writeTo(output, abortSignal);
@@ -81,10 +82,11 @@ export default class Packer {
 
     /**
      * @param {import("armarius-io").FileHandleInterface} directory
+     * @param {string} basePath
      * @returns {Promise<WriteArchiveStream>}
      */
-    async packToStream(directory) {
-        let generator = this.generateEntries(directory);
+    async packToStream(directory, basePath = '') {
+        let generator = this.generateEntries(directory, basePath);
         let archive = new WriteArchive(generator, this.writeArchiveOptions);
         return new WriteArchiveStream(archive, async () => await generator.return(null));
     }

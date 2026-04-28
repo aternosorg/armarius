@@ -43,6 +43,7 @@ export async function extract(path, target, options = {}) {
  * @property {EntrySourceOptions|EntrySourceOptionsObject} [entrySourceOptions] - Options to pass to the EntrySource objects.
  * @property {AbortSignal} [abortSignal] - An AbortSignal to allow aborting the packing process.
  * @property {?function(file: import("armarius-io").FileHandleInterface, stat: import("armarius-io").StatInterface, filename: string): Promise<boolean>} [filter] - An optional filter function for files to include in the archive.
+ * @property {string} [archiveBasePath] - A base path to prepend to the beginning of each entry's filename when packing.
  */
 
 /**
@@ -59,7 +60,7 @@ export async function pack(source, target, options = {}) {
     let sourceDirectory = new NodeFileHandle(source);
     try {
         await new Packer(options.archiveOptions ?? {}, options.entrySourceOptions ?? {}, options.filter ?? null)
-            .pack(sourceDirectory, io, options.abortSignal ?? null);
+            .pack(sourceDirectory, io, options.abortSignal ?? null, options.archiveBasePath ?? "");
     } finally {
         await io[symbols.asyncDispose]();
         await sourceDirectory[symbols.asyncDispose]();
