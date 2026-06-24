@@ -27,7 +27,13 @@ export async function extract(path, target, options = {}) {
     }
     let io = await NodeFileIO.open(path);
     let targetDirectory = new NodeFileHandle(target);
-    let archive = new ReadArchive(io, options.archiveOptions ?? {});
+    let archiveOptions = options.archiveOptions ?? {};
+    if (options.allowBackslashSeparators) {
+        archiveOptions.entryOptions = Object.assign({}, archiveOptions.entryOptions ?? {}, {
+            allowBackslashSeparators: true
+        });
+    }
+    let archive = new ReadArchive(io, archiveOptions);
     try {
         await archive.init();
         await new Extractor(options.filter ?? null, options.maxConcurrentEntries ?? 10, options.allowBackslashSeparators ?? false)
