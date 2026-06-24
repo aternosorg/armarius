@@ -124,6 +124,9 @@ export default class ArchiveEntry {
         while (name.startsWith('/')) {
             name = name.substring(1);
         }
+        while (this.options.allowBackslashSeparators && name.startsWith('\\')) {
+            name = name.substring(1);
+        }
         this.fileNameString = name;
         return this.fileNameString;
     }
@@ -205,6 +208,11 @@ export default class ArchiveEntry {
         }
         if (this.options.allowTrailingSlashInFileName && this.centralDirectoryFileHeader.compressedSize > 0) {
             return false;
+        }
+
+        let filename = this.getFileNameString();
+        if (this.options.allowBackslashSeparators && filename.endsWith('\\')) {
+            return true;
         }
 
         return this.getFileNameString().endsWith('/');

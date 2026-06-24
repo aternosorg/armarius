@@ -10,6 +10,7 @@ import Verifier from './Verifier.js';
  * @property {string} [archiveBasePath] - A base path to remove from the beginning of each entry's filename when extracting.
  * @property {ReadArchiveOptions|ReadArchiveOptionsObject} [archiveOptions] - Options to pass to the ReadArchive constructor when reading the archive.
  * @property {number} [maxConcurrentEntries] - The maximum number of entries to extract concurrently. Default is 10.
+ * @property {boolean} [allowBackslashSeparators] - Interpret backslashes in file names as separators
  * @property {AbortSignal} [abortSignal] - An AbortSignal to allow aborting the extraction process.
  * @property {?function(entry: ArchiveEntry, filename: string): Promise<boolean>} [filter] - An optional filter function for archive entries.
  */
@@ -29,7 +30,7 @@ export async function extract(path, target, options = {}) {
     let archive = new ReadArchive(io, options.archiveOptions ?? {});
     try {
         await archive.init();
-        await new Extractor(options.filter ?? null, options.maxConcurrentEntries ?? 10)
+        await new Extractor(options.filter ?? null, options.maxConcurrentEntries ?? 10, options.allowBackslashSeparators ?? false)
             .extract(archive, targetDirectory, options.archiveBasePath ?? "", options.abortSignal ?? null);
     } finally {
         await io[symbols.asyncDispose]();

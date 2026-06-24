@@ -5,14 +5,17 @@ import AsyncSafeEntryIterator from "../Archive/Entry/AsyncSafeEntryIterator.js";
 export default class Extractor {
     /** @type {number} */ maxConcurrentEntries;
     /** @type {?function(entry: ArchiveEntry, filename: string): Promise<boolean>} */ filter;
+    /** @type {boolean} */ allowBackslashSeparators;
 
     /**
      * @param {?function(entry: ArchiveEntry, filename: string): Promise<boolean>} filter
      * @param {number} maxConcurrentEntries
+     * @param {boolean} allowBackslashSeparators
      */
-    constructor(filter = null, maxConcurrentEntries = 10) {
+    constructor(filter = null, maxConcurrentEntries = 10, allowBackslashSeparators = false) {
         this.maxConcurrentEntries = maxConcurrentEntries;
         this.filter = filter;
+        this.allowBackslashSeparators = allowBackslashSeparators;
     }
 
     /**
@@ -31,6 +34,9 @@ export default class Extractor {
                 continue;
             }
             filename = filename.substring(archiveBasePath.length);
+            if (this.allowBackslashSeparators) {
+                filename = filename.replace(/\\/g, '/');
+            }
             if (this.filter && !await this.filter(entry, filename)) {
                 continue;
             }
