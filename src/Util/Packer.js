@@ -35,7 +35,7 @@ export default class Packer {
         for await (let child of directory.getChildren()) {
             try {
                 let stat = await child.stat();
-                let filename = Path.basename(child.getUrl().pathname)
+                let filename = decodeURIComponent(Path.basename(child.getUrl().pathname))
                 if (stat.isDirectory()) {
                     let path = `${basePath}${filename}/`;
                     if (this.filter && !await this.filter(child, stat, path)) {

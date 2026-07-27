@@ -60,6 +60,33 @@ test("Pack directory to ReadbaleStream", async () => {
     expect(names).toEqual(['dir/', 'dir/empty_subdir/', 'dir/file2.txt', 'file.txt']);
 });
 
+test("Decode special characters in entry names", async () => {
+    let sourceDir = pathModule.join(tempDir.pathname, 'special');
+    await fs.promises.mkdir(pathModule.join(sourceDir, 'my folder & stuff'), {recursive: true});
+    await fs.promises.writeFile(pathModule.join(sourceDir, 'my folder & stuff', 'file #1.txt'), "content");
+    await fs.promises.writeFile(pathModule.join(sourceDir, '100% done.txt'), "content");
+
+    let dir = new NodeFileHandle(pathToFileURL(sourceDir + pathModule.sep));
+
+    {
+        await using outputIO = await NodeFileIO.open(new URL("output-special.zip", tempDir), 'w+');
+        let packer = new Packer();
+        await packer.pack(dir, outputIO);
+    }
+
+    await using archiveIO = await NodeFileIO.open(new URL("output-special.zip", tempDir), 'r');
+    let archive = new ReadArchive(archiveIO);
+    await archive.init();
+
+    let entries = await archive.getAllEntries();
+    let names = entries.map(e => e.getFileNameString()).sort();
+    expect(names).toEqual([
+        '100% done.txt',
+        'my folder & stuff/',
+        'my folder & stuff/file #1.txt',
+    ]);
+});
+
 test("Dispose of all file handles and IO contexts", async () => {
     let tracking = new TrackingContext();
     let dir = new TrackingFileHandle(new NodeFileHandle(new URL("fixtures/base/", import.meta.url)), tracking);
