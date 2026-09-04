@@ -32,9 +32,30 @@ export default class Zip64ExtendedInformation extends ExtraField {
      */
     async read(reader) {
         await super.read(reader);
+
+        let remaining = this.size;
+
+        if (remaining < 8) {
+            return;
+        }
         this.uncompressedSize = await reader.getBigUint64();
+        remaining -= 8;
+
+        if (remaining < 8) {
+            return;
+        }
         this.compressedSize = await reader.getBigUint64();
+        remaining -= 8;
+
+        if (remaining < 8) {
+            return;
+        }
         this.localHeaderOffset = await reader.getBigUint64();
+        remaining -= 8;
+
+        if (remaining < 4) {
+            return;
+        }
         this.diskNumberStart = await reader.getUint32();
     }
 

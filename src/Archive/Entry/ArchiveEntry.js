@@ -166,7 +166,7 @@ export default class ArchiveEntry {
      * @returns {BigInt}
      */
     getLocalHeaderOffset() {
-        if (this.zip64ExtendedInformation) {
+        if (this.zip64ExtendedInformation && this.centralDirectoryFileHeader.localHeaderOffset === Constants.MAX_UINT32) {
             return this.zip64ExtendedInformation.localHeaderOffset;
         }
         return BigInt(this.centralDirectoryFileHeader.localHeaderOffset);
@@ -176,7 +176,7 @@ export default class ArchiveEntry {
      * @returns {BigInt}
      */
     getCompressedSize() {
-        if (this.zip64ExtendedInformation) {
+        if (this.zip64ExtendedInformation && this.centralDirectoryFileHeader.compressedSize === Constants.MAX_UINT32) {
             return this.zip64ExtendedInformation.compressedSize;
         }
         return BigInt(this.centralDirectoryFileHeader.compressedSize);
@@ -186,7 +186,7 @@ export default class ArchiveEntry {
      * @returns {BigInt}
      */
     getUncompressedSize() {
-        if (this.zip64ExtendedInformation) {
+        if (this.zip64ExtendedInformation && this.centralDirectoryFileHeader.uncompressedSize === Constants.MAX_UINT32) {
             return this.zip64ExtendedInformation.uncompressedSize;
         }
         return BigInt(this.centralDirectoryFileHeader.uncompressedSize);
