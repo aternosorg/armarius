@@ -1,4 +1,5 @@
 import ExtraField from "./ExtraField.js";
+import Constants from "../../../Constants.js";
 import {BigIntUtils} from "armarius-io";
 
 export default class Zip64ExtendedInformation extends ExtraField {
@@ -28,35 +29,44 @@ export default class Zip64ExtendedInformation extends ExtraField {
     diskNumberStart;
 
     /**
-     * @inheritDoc
+     * A value is only present in the Zip64 extended information field if the
+     * corresponding base field in the file header is set to its maximum value
+     * (all bits set). The fields keep their fixed order, but any of them may be
+     * absent, so we only read a value when its base field signals that it was
+     * moved into this field. The declared size is used as an additional bound in
+     * case the field is truncated or no header context is available.
+     *
+     * @param {import("armarius-io").IO} reader
+     * @param {?import("../FileHeader.js").default} header
      */
-    async read(reader) {
+    async read(reader, header = null) {
         await super.read(reader);
 
         let remaining = this.size;
 
-        if (remaining < 8) {
-            return;
-        }
-        this.uncompressedSize = await reader.getBigUint64();
-        remaining -= 8;
+        // Without a header to compare against, fall back to reading every field
+        // that still fits in the declared size.
+        let hasUncompressedSize = !header || header.uncompressedSize === Constants.MAX_UINT32;
+        let hasCompressedSize = !header || header.compressedSize === Constants.MAX_UINT32;
+        let hasLocalHeaderOffset = !header || header.localHeaderOffset === Constants.MAX_UINT32;
+        let hasDiskNumberStart = !header || header.diskNumberStart === Constants.MAX_UINT16;
 
-        if (remaining < 8) {
-            return;
+        if (hasUncompressedSize && remaining >= 8) {
+            this.uncompressedSize = await reader.getBigUint64();
+            remaining -= 8;
         }
-        this.compressedSize = await reader.getBigUint64();
-        remaining -= 8;
-
-        if (remaining < 8) {
-            return;
+        if (hasCompressedSize && remaining >= 8) {
+            this.compressedSize = await reader.getBigUint64();
+            remaining -= 8;
         }
-        this.localHeaderOffset = await reader.getBigUint64();
-        remaining -= 8;
-
-        if (remaining < 4) {
-            return;
+        if (hasLocalHeaderOffset && remaining >= 8) {
+            this.localHeaderOffset = await reader.getBigUint64();
+            remaining -= 8;
         }
-        this.diskNumberStart = await reader.getUint32();
+        if (hasDiskNumberStart && remaining >= 4) {
+            this.diskNumberStart = await reader.getUint32();
+            remaining -= 4;
+        }
     }
 
     /**

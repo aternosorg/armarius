@@ -180,7 +180,7 @@ export default class FileHeader extends SignatureStructure {
     async loadExtraField(type, io) {
         switch (type) {
             case Constants.EXTRAFIELD_TYPE_ZIP64_EXTENDED_INFO:
-                return await Zip64ExtendedInformation.fromIO(io);
+                return await Zip64ExtendedInformation.fromIO(io, this);
             case Constants.EXTRAFIELD_TYPE_UNICODE_FILENAME:
             case Constants.EXTRAFIELD_TYPE_UNICODE_COMMENT:
                 return await UnicodeExtraField.fromIO(io);
