@@ -65,7 +65,6 @@ export default class Zip64ExtendedInformation extends ExtraField {
         }
         if (hasDiskNumberStart && remaining >= 4) {
             this.diskNumberStart = await reader.getUint32();
-            remaining -= 4;
         }
     }
 
