@@ -78,10 +78,14 @@ export default class Zip64ExtendedInformation extends ExtraField {
 
         view.setUint16(0, 28, true);
 
-        BigIntUtils.setBigUint64InView(view, 2, this.uncompressedSize, true);
-        BigIntUtils.setBigUint64InView(view, 10, this.compressedSize, true);
-        BigIntUtils.setBigUint64InView(view, 18, this.localHeaderOffset, true);
-        view.setUint32(26, this.diskNumberStart, true);
+        // A field read from an existing archive only fills the values whose base
+        // header field was set to its maximum; the rest stay undefined. We always
+        // write the full record, defaulting any missing value to zero so building
+        // a header from a partially read field never throws.
+        BigIntUtils.setBigUint64InView(view, 2, this.uncompressedSize ?? 0n, true);
+        BigIntUtils.setBigUint64InView(view, 10, this.compressedSize ?? 0n, true);
+        BigIntUtils.setBigUint64InView(view, 18, this.localHeaderOffset ?? 0n, true);
+        view.setUint32(26, this.diskNumberStart ?? 0, true);
 
         return data;
     }

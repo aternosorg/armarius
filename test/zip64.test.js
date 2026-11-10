@@ -1,11 +1,18 @@
 import {
     ArchiveEntry,
+    ArchiveEntryEntrySource,
     CentralDirectoryFileHeader,
     Constants,
+    ReadArchive,
+    WriteArchive,
     Zip64ExtendedInformation
 } from '../index.js';
 import {expect, test} from '@jest/globals';
-import {ArrayBufferIO, BigInt} from 'armarius-io';
+import {ArrayBufferIO, BigInt, CRC32} from 'armarius-io';
+import {writeArchiveToBuffer} from './util.js';
+
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
 
 /**
  * Build the raw bytes of a Zip64 extended information extra field body, i.e.
@@ -247,4 +254,145 @@ test('Zip64: entry getters return defined values for an offset-only field (repac
         expect(value).not.toBeUndefined();
         expect(typeof value).toBe('bigint');
     }
+});
+
+test('Zip64: serialize does not throw when values are missing', async () => {
+    // A field read from an archive where no base field was maxed leaves every
+    // value undefined. Serializing it must still produce a valid (all-zero)
+    // record instead of throwing.
+    let field = new Zip64ExtendedInformation();
+    let data = await field.serialize();
+
+    let view = new DataView(data.buffer, data.byteOffset, data.byteLength);
+    expect(data.byteLength).toBe(30);
+    expect(view.getUint16(0, true)).toBe(28);
+    for (let i = 2; i < data.byteLength; i++) {
+        expect(data[i]).toBe(0);
+    }
+});
+
+/**
+ * Build a ZIP whose single stored entry has a Zip64 extended information field
+ * in its local header but not in its central directory header. This is what
+ * Python's `ZipFile.open(name, 'w', force_zip64=True)` produces for a small
+ * file: the streamed local header reserves Zip64 size slots (base sizes set to
+ * 0xffffffff) while the central directory, written afterwards with the real
+ * small sizes, has no Zip64 field.
+ *
+ * @param {string} nameStr
+ * @param {string} payloadStr
+ * @returns {Uint8Array}
+ */
+function forcedZip64SmallFile(nameStr, payloadStr) {
+    let name = encoder.encode(nameStr);
+    let payload = encoder.encode(payloadStr);
+    let crc = CRC32.hash(payload);
+    let flags = Constants.BITFLAG_DATA_DESCRIPTOR;
+
+    let localExtraLength = 20;
+    let localHeaderSize = Constants.LENGTH_LOCAL_FILE_HEADER + name.byteLength + localExtraLength;
+    let dataDescriptorSize = Constants.LENGTH_DATA_DESCRIPTOR_ZIP64;
+    let centralHeaderSize = Constants.LENGTH_CENTRAL_DIR_FILE_HEADER + name.byteLength;
+    let centralDirOffset = localHeaderSize + payload.byteLength + dataDescriptorSize;
+    let total = centralDirOffset + centralHeaderSize + Constants.LENGTH_END_OF_CENTRAL_DIR;
+
+    let buf = new Uint8Array(total);
+    let view = new DataView(buf.buffer);
+
+    // Local file header
+    let p = 0;
+    view.setUint32(p, Constants.SIGNATURE_LOCAL_FILE_HEADER, true);
+    view.setUint16(p + 4, Constants.MIN_VERSION_ZIP64, true);
+    view.setUint16(p + 6, flags, true);
+    view.setUint16(p + 8, Constants.COMPRESSION_METHOD_STORE, true);
+    view.setUint16(p + 10, 0, true);                       // mod time
+    view.setUint16(p + 12, 33, true);                      // mod date = 1980-01-01
+    view.setUint32(p + 14, 0, true);                       // crc (deferred to descriptor)
+    view.setUint32(p + 18, Constants.MAX_UINT32, true);    // compressed size slot
+    view.setUint32(p + 22, Constants.MAX_UINT32, true);    // uncompressed size slot
+    view.setUint16(p + 26, name.byteLength, true);
+    view.setUint16(p + 28, localExtraLength, true);
+    buf.set(name, p + 30);
+    let ep = p + 30 + name.byteLength;
+    view.setUint16(ep, Constants.EXTRAFIELD_TYPE_ZIP64_EXTENDED_INFO, true);
+    view.setUint16(ep + 2, 16, true);                      // two 8-byte values
+    view.setBigUint64(ep + 4, 0n, true);                   // uncompressed size (unknown while streaming)
+    view.setBigUint64(ep + 12, 0n, true);                  // compressed size (unknown while streaming)
+
+    // File data (stored)
+    p = localHeaderSize;
+    buf.set(payload, p);
+    p += payload.byteLength;
+
+    // Zip64 data descriptor
+    view.setUint32(p, Constants.SIGNATURE_DATA_DESCRIPTOR, true);
+    view.setUint32(p + 4, crc, true);
+    view.setBigUint64(p + 8, BigInt(payload.byteLength), true);
+    view.setBigUint64(p + 16, BigInt(payload.byteLength), true);
+    p += dataDescriptorSize;
+
+    // Central directory header (no Zip64 field, real 32-bit sizes and offset)
+    view.setUint32(p, Constants.SIGNATURE_CENTRAL_DIR_FILE_HEADER, true);
+    view.setUint16(p + 4, Constants.MIN_VERSION_ZIP64, true);
+    view.setUint16(p + 6, Constants.MIN_VERSION_ZIP64, true);
+    view.setUint16(p + 8, flags, true);
+    view.setUint16(p + 10, Constants.COMPRESSION_METHOD_STORE, true);
+    view.setUint16(p + 12, 0, true);
+    view.setUint16(p + 14, 33, true);
+    view.setUint32(p + 16, crc, true);
+    view.setUint32(p + 20, payload.byteLength, true);
+    view.setUint32(p + 24, payload.byteLength, true);
+    view.setUint16(p + 28, name.byteLength, true);
+    view.setUint16(p + 30, 0, true);                       // extra field length
+    view.setUint16(p + 32, 0, true);                       // comment length
+    view.setUint16(p + 34, 0, true);                       // disk number start
+    view.setUint16(p + 36, 0, true);
+    view.setUint32(p + 38, 0, true);
+    view.setUint32(p + 42, 0, true);                       // local header offset
+    buf.set(name, p + 46);
+    p += centralHeaderSize;
+
+    // End of central directory record
+    view.setUint32(p, Constants.SIGNATURE_END_OF_CENTRAL_DIR, true);
+    view.setUint16(p + 4, 0, true);
+    view.setUint16(p + 6, 0, true);
+    view.setUint16(p + 8, 1, true);
+    view.setUint16(p + 10, 1, true);
+    view.setUint32(p + 12, centralHeaderSize, true);
+    view.setUint32(p + 16, centralDirOffset, true);
+    view.setUint16(p + 20, 0, true);
+
+    return buf;
+}
+
+test('Zip64: copy an entry whose local header has a Zip64 field but the central directory does not', async () => {
+    let zipBytes = forcedZip64SmallFile('a.txt', 'hello world!');
+    let payload = encoder.encode('hello world!');
+
+    // Sanity check the crafted archive: central directory has no Zip64 field,
+    // but the local header does.
+    let source = new ReadArchive(new ArrayBufferIO(zipBytes.buffer, zipBytes.byteOffset, zipBytes.byteLength));
+    await source.init();
+    let [srcEntry] = await source.getAllEntries();
+    expect(srcEntry.zip64ExtendedInformation).toBeFalsy();
+    await srcEntry.readLocalFileHeader();
+    expect(srcEntry.localFileHeader.getExtraField(Constants.EXTRAFIELD_TYPE_ZIP64_EXTENDED_INFO))
+        .toBeInstanceOf(Zip64ExtendedInformation);
+
+    // Re-zip the entry. This used to throw "Cannot convert undefined to a BigInt"
+    // while serializing the local header's copied Zip64 field.
+    let read = new ReadArchive(new ArrayBufferIO(zipBytes.buffer, zipBytes.byteOffset, zipBytes.byteLength));
+    await read.init();
+    let entries = await read.getAllEntries();
+    let i = 0;
+    let out = new WriteArchive(() => i < entries.length ? new ArchiveEntryEntrySource(entries[i++], {}) : null);
+    let outData = await writeArchiveToBuffer(out);
+
+    // The rewritten archive must be readable and preserve the content.
+    let result = new ReadArchive(new ArrayBufferIO(outData.buffer, outData.byteOffset, outData.byteLength));
+    await result.init();
+    let [resEntry] = await result.getAllEntries();
+    expect(resEntry.getFileNameString()).toBe('a.txt');
+    expect(decoder.decode(await resEntry.getData())).toBe('hello world!');
+    expect(resEntry.getCrc()).toBe(CRC32.hash(payload));
 });

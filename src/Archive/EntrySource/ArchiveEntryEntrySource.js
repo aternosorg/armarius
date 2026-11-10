@@ -79,6 +79,16 @@ export default class ArchiveEntryEntrySource extends EntrySource {
             this.sourceEntry.centralDirectoryFileHeader.getExtraFields() :
             this.sourceEntry.localFileHeader.getExtraFields();
         for (let [type, field] of extraFields) {
+            // The Zip64 extended information field is specific to the header it
+            // lives in (it holds this entry's offset and the sizes as stored in
+            // that particular header). A copied one would be wrong for the new
+            // header, and a source local header may even contain one while its
+            // central directory does not. setCommonExtraFields() below recreates
+            // a complete field whenever the new entry actually needs Zip64, so we
+            // never carry the source field over.
+            if (type === Constants.EXTRAFIELD_TYPE_ZIP64_EXTENDED_INFO) {
+                continue;
+            }
             if (!(field instanceof GenericExtraField)) {
                 header.setExtraField(type, field);
             }
