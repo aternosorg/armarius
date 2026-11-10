@@ -7,7 +7,8 @@ import {
     WriteArchive,
     Zip64ExtendedInformation
 } from '../index.js';
-import {expect, test} from '@jest/globals';
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
 import {ArrayBufferIO, BigInt, CRC32} from 'armarius-io';
 import {writeArchiveToBuffer} from './util.js';
 
@@ -103,10 +104,10 @@ test('Zip64: reads all fields when every base field is maxed', async () => {
         {compressedSize: MAX32, uncompressedSize: MAX32, localHeaderOffset: MAX32, diskNumberStart: MAX16}
     );
 
-    expect(field.uncompressedSize).toBe(10n);
-    expect(field.compressedSize).toBe(20n);
-    expect(field.localHeaderOffset).toBe(30n);
-    expect(field.diskNumberStart).toBe(2);
+    assert.strictEqual(field.uncompressedSize, 10n);
+    assert.strictEqual(field.compressedSize, 20n);
+    assert.strictEqual(field.localHeaderOffset, 30n);
+    assert.strictEqual(field.diskNumberStart, 2);
 });
 
 test('Zip64: only the local header offset is maxed (regression: must not be read as uncompressedSize)', async () => {
@@ -119,10 +120,10 @@ test('Zip64: only the local header offset is maxed (regression: must not be read
         {compressedSize: 100, uncompressedSize: 200, localHeaderOffset: MAX32, diskNumberStart: 0}
     );
 
-    expect(field.uncompressedSize).toBeUndefined();
-    expect(field.compressedSize).toBeUndefined();
-    expect(field.localHeaderOffset).toBe(0x1_0000_0000n);
-    expect(field.diskNumberStart).toBeUndefined();
+    assert.strictEqual(field.uncompressedSize, undefined);
+    assert.strictEqual(field.compressedSize, undefined);
+    assert.strictEqual(field.localHeaderOffset, 0x1_0000_0000n);
+    assert.strictEqual(field.diskNumberStart, undefined);
 });
 
 test('Zip64: only the compressed size is maxed', async () => {
@@ -133,10 +134,10 @@ test('Zip64: only the compressed size is maxed', async () => {
         {compressedSize: MAX32, uncompressedSize: 200, localHeaderOffset: 500, diskNumberStart: 0}
     );
 
-    expect(field.uncompressedSize).toBeUndefined();
-    expect(field.compressedSize).toBe(0x2_0000_0000n);
-    expect(field.localHeaderOffset).toBeUndefined();
-    expect(field.diskNumberStart).toBeUndefined();
+    assert.strictEqual(field.uncompressedSize, undefined);
+    assert.strictEqual(field.compressedSize, 0x2_0000_0000n);
+    assert.strictEqual(field.localHeaderOffset, undefined);
+    assert.strictEqual(field.diskNumberStart, undefined);
 });
 
 test('Zip64: both sizes maxed but offset is not (common large-file case)', async () => {
@@ -148,10 +149,10 @@ test('Zip64: both sizes maxed but offset is not (common large-file case)', async
         {compressedSize: MAX32, uncompressedSize: MAX32, localHeaderOffset: 1234, diskNumberStart: 0}
     );
 
-    expect(field.uncompressedSize).toBe(0x1_0000_0001n);
-    expect(field.compressedSize).toBe(0x1_0000_0002n);
-    expect(field.localHeaderOffset).toBeUndefined();
-    expect(field.diskNumberStart).toBeUndefined();
+    assert.strictEqual(field.uncompressedSize, 0x1_0000_0001n);
+    assert.strictEqual(field.compressedSize, 0x1_0000_0002n);
+    assert.strictEqual(field.localHeaderOffset, undefined);
+    assert.strictEqual(field.diskNumberStart, undefined);
 });
 
 test('Zip64: disk number start uses the 16-bit sentinel', async () => {
@@ -162,10 +163,10 @@ test('Zip64: disk number start uses the 16-bit sentinel', async () => {
         {compressedSize: 1, uncompressedSize: 2, localHeaderOffset: 3, diskNumberStart: MAX16}
     );
 
-    expect(field.uncompressedSize).toBeUndefined();
-    expect(field.compressedSize).toBeUndefined();
-    expect(field.localHeaderOffset).toBeUndefined();
-    expect(field.diskNumberStart).toBe(7);
+    assert.strictEqual(field.uncompressedSize, undefined);
+    assert.strictEqual(field.compressedSize, undefined);
+    assert.strictEqual(field.localHeaderOffset, undefined);
+    assert.strictEqual(field.diskNumberStart, 7);
 });
 
 test('Zip64: without a header, falls back to reading every field that fits', async () => {
@@ -176,10 +177,10 @@ test('Zip64: without a header, falls back to reading every field that fits', asy
         ])
     );
 
-    expect(field.uncompressedSize).toBe(11n);
-    expect(field.compressedSize).toBe(22n);
-    expect(field.localHeaderOffset).toBeUndefined();
-    expect(field.diskNumberStart).toBeUndefined();
+    assert.strictEqual(field.uncompressedSize, 11n);
+    assert.strictEqual(field.compressedSize, 22n);
+    assert.strictEqual(field.localHeaderOffset, undefined);
+    assert.strictEqual(field.diskNumberStart, undefined);
 });
 
 test('Zip64: parsed through a central directory header, offset-only field, stays aligned', async () => {
@@ -209,15 +210,15 @@ test('Zip64: parsed through a central directory header, offset-only field, stays
     }));
 
     let zip64 = header.getExtraField(Constants.EXTRAFIELD_TYPE_ZIP64_EXTENDED_INFO);
-    expect(zip64).toBeInstanceOf(Zip64ExtendedInformation);
-    expect(zip64.localHeaderOffset).toBe(0x1_0000_0000n);
-    expect(zip64.uncompressedSize).toBeUndefined();
-    expect(zip64.compressedSize).toBeUndefined();
+    assert.ok(zip64 instanceof Zip64ExtendedInformation);
+    assert.strictEqual(zip64.localHeaderOffset, 0x1_0000_0000n);
+    assert.strictEqual(zip64.uncompressedSize, undefined);
+    assert.strictEqual(zip64.compressedSize, undefined);
 
     // The following extra field must still be found, proving no misalignment.
     let generic = header.getExtraField(0xbbaa);
-    expect(generic).toBeTruthy();
-    expect(generic.size).toBe(2);
+    assert.ok(generic);
+    assert.strictEqual(generic.size, 2);
 });
 
 test('Zip64: entry getters return defined values for an offset-only field (repack regression)', async () => {
@@ -240,19 +241,19 @@ test('Zip64: entry getters return defined values for an offset-only field (repac
         extraField: zip64Blob
     }), 0);
 
-    expect(entry.zip64ExtendedInformation).toBeInstanceOf(Zip64ExtendedInformation);
+    assert.ok(entry.zip64ExtendedInformation instanceof Zip64ExtendedInformation);
 
     // Offset is maxed in the base header, so it comes from the zip64 field.
-    expect(entry.getLocalHeaderOffset()).toBe(0x1_0000_0000n);
+    assert.strictEqual(entry.getLocalHeaderOffset(), 0x1_0000_0000n);
     // Sizes are not maxed, so they come from the base header and stay defined.
-    expect(entry.getCompressedSize()).toBe(BigInt(100));
-    expect(entry.getUncompressedSize()).toBe(BigInt(200));
+    assert.strictEqual(entry.getCompressedSize(), BigInt(100));
+    assert.strictEqual(entry.getUncompressedSize(), BigInt(200));
 
     // None of the values the writer needs are undefined, so building a fresh
     // zip64 field from them would not throw.
     for (let value of [entry.getLocalHeaderOffset(), entry.getCompressedSize(), entry.getUncompressedSize()]) {
-        expect(value).not.toBeUndefined();
-        expect(typeof value).toBe('bigint');
+        assert.notStrictEqual(value, undefined);
+        assert.strictEqual(typeof value, 'bigint');
     }
 });
 
@@ -264,10 +265,10 @@ test('Zip64: serialize does not throw when values are missing', async () => {
     let data = await field.serialize();
 
     let view = new DataView(data.buffer, data.byteOffset, data.byteLength);
-    expect(data.byteLength).toBe(30);
-    expect(view.getUint16(0, true)).toBe(28);
+    assert.strictEqual(data.byteLength, 30);
+    assert.strictEqual(view.getUint16(0, true), 28);
     for (let i = 2; i < data.byteLength; i++) {
-        expect(data[i]).toBe(0);
+        assert.strictEqual(data[i], 0);
     }
 });
 
@@ -374,10 +375,9 @@ test('Zip64: copy an entry whose local header has a Zip64 field but the central 
     let source = new ReadArchive(new ArrayBufferIO(zipBytes.buffer, zipBytes.byteOffset, zipBytes.byteLength));
     await source.init();
     let [srcEntry] = await source.getAllEntries();
-    expect(srcEntry.zip64ExtendedInformation).toBeFalsy();
+    assert.ok(!(srcEntry.zip64ExtendedInformation));
     await srcEntry.readLocalFileHeader();
-    expect(srcEntry.localFileHeader.getExtraField(Constants.EXTRAFIELD_TYPE_ZIP64_EXTENDED_INFO))
-        .toBeInstanceOf(Zip64ExtendedInformation);
+    assert.ok(srcEntry.localFileHeader.getExtraField(Constants.EXTRAFIELD_TYPE_ZIP64_EXTENDED_INFO) instanceof Zip64ExtendedInformation);
 
     // Re-zip the entry. This used to throw "Cannot convert undefined to a BigInt"
     // while serializing the local header's copied Zip64 field.
@@ -392,7 +392,7 @@ test('Zip64: copy an entry whose local header has a Zip64 field but the central 
     let result = new ReadArchive(new ArrayBufferIO(outData.buffer, outData.byteOffset, outData.byteLength));
     await result.init();
     let [resEntry] = await result.getAllEntries();
-    expect(resEntry.getFileNameString()).toBe('a.txt');
-    expect(decoder.decode(await resEntry.getData())).toBe('hello world!');
-    expect(resEntry.getCrc()).toBe(CRC32.hash(payload));
+    assert.strictEqual(resEntry.getFileNameString(), 'a.txt');
+    assert.strictEqual(decoder.decode(await resEntry.getData()), 'hello world!');
+    assert.strictEqual(resEntry.getCrc(), CRC32.hash(payload));
 });

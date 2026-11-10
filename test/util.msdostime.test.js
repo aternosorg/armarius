@@ -1,3 +1,5 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
 import MsDosTime from '../src/Util/MsDosTime.js';
 
 const timestamp = 1655914036349;
@@ -8,22 +10,21 @@ let timeValue = 33000;
 let dateValue = 21718;
 
 test('Encode date value', () => {
-    expect(MsDosTime.encodeDate(date)).toBe(dateValue);
+    assert.strictEqual(MsDosTime.encodeDate(date), dateValue);
 });
 
 test('Encode time value', () => {
-    expect(MsDosTime.encodeTime(date)).toBe(timeValue);
+    assert.strictEqual(MsDosTime.encodeTime(date), timeValue);
 });
 
 test('Decode time and date value', () => {
-    expect(MsDosTime.decode(dateValue, timeValue).getTime()).toBe(roundedTimestamp);
+    assert.strictEqual(MsDosTime.decode(dateValue, timeValue).getTime(), roundedTimestamp);
 });
 
 test('Clamp date to min', () => {
-    expect(MsDosTime.clampDate(new Date(0))).toBe(MsDosTime.MIN);
+    assert.strictEqual(MsDosTime.clampDate(new Date(0)), MsDosTime.MIN);
 });
 
 test('Clamp date to max', () => {
-    expect(MsDosTime.clampDate(new Date(2108, 11, 31))).toBe(MsDosTime.MAX);
+    assert.strictEqual(MsDosTime.clampDate(new Date(2108, 11, 31)), MsDosTime.MAX);
 });
-

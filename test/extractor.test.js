@@ -1,4 +1,5 @@
-import {afterEach, beforeEach, expect, test} from "@jest/globals";
+import {afterEach, beforeEach, test} from "node:test";
+import assert from "node:assert/strict";
 import * as os from "node:os";
 import fs from "node:fs";
 import * as pathModule from "node:path";
@@ -34,10 +35,10 @@ test("Extract archive", async () => {
     await extractor.extract(archive, output);
 
     let extractedFiles = await fs.promises.readdir(tempDir);
-    expect(extractedFiles.sort()).toEqual(['dir', 'file.txt']);
+    assert.deepStrictEqual(extractedFiles.sort(), ['dir', 'file.txt']);
 
     extractedFiles = await fs.promises.readdir(pathModule.join(tempDir.pathname, 'dir'));
-    expect(extractedFiles.sort()).toEqual(['empty_subdir', 'file2.txt']);
+    assert.deepStrictEqual(extractedFiles.sort(), ['empty_subdir', 'file2.txt']);
 });
 
 test("Dispose of all file handles and IO contexts", async () => {
@@ -54,6 +55,6 @@ test("Dispose of all file handles and IO contexts", async () => {
     await extractor.extract(archive, output);
     await output[symbols.asyncDispose]();
 
-    expect(tracking.allHandles.size).toBe(0);
-    expect(tracking.allIOs.size).toBe(0);
+    assert.strictEqual(tracking.allHandles.size, 0);
+    assert.strictEqual(tracking.allIOs.size, 0);
 });

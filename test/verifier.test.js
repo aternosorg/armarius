@@ -1,4 +1,5 @@
-import {expect, test} from "@jest/globals";
+import {test} from "node:test";
+import assert from "node:assert/strict";
 import fs from "node:fs";
 import {ArrayBufferIO, NodeFileIO} from "armarius-io";
 import Verifier from "../src/Util/Verifier.js";
@@ -12,7 +13,7 @@ test("Verify archive", async () => {
     await archive.init();
 
     let verifier = new Verifier();
-    await expect(verifier.verify(archive)).resolves.toBe(verifier);
+    assert.strictEqual(await verifier.verify(archive), verifier);
 });
 
 test("Throw on archive error", async () => {
@@ -25,7 +26,7 @@ test("Throw on archive error", async () => {
 
     let verifier = new Verifier();
 
-    await expect(verifier.verify(archive)).rejects.toThrow();
+    await assert.rejects(verifier.verify(archive));
 });
 
 test("Ignore data error in header mode", async () => {
@@ -38,5 +39,5 @@ test("Ignore data error in header mode", async () => {
 
     let verifier = new Verifier("header");
 
-    await expect(verifier.verify(archive)).resolves.toBe(verifier);
+    assert.strictEqual(await verifier.verify(archive), verifier);
 });

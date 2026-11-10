@@ -1,4 +1,5 @@
-import {afterEach, beforeEach, expect, test} from "@jest/globals";
+import {afterEach, beforeEach, test} from "node:test";
+import assert from "node:assert/strict";
 import * as os from "node:os";
 import fs from "node:fs";
 import * as pathModule from "node:path";
@@ -24,10 +25,10 @@ test("Extract archive", async () => {
     await extract(archivePath, tempDir);
 
     let extractedFiles = await fs.promises.readdir(tempDir);
-    expect(extractedFiles.sort()).toEqual(['dir', 'file.txt']);
+    assert.deepStrictEqual(extractedFiles.sort(), ['dir', 'file.txt']);
 
     extractedFiles = await fs.promises.readdir(pathModule.join(tempDir.pathname, 'dir'));
-    expect(extractedFiles.sort()).toEqual(['empty_subdir', 'file2.txt']);
+    assert.deepStrictEqual(extractedFiles.sort(), ['empty_subdir', 'file2.txt']);
 });
 
 test("Pack files", async () => {
@@ -38,11 +39,11 @@ test("Pack files", async () => {
     await archive.init();
 
     let entries = await archive.getAllEntries();
-    expect(entries.length).toBe(4);
+    assert.strictEqual(entries.length, 4);
     let names = entries.map(e => e.getFileNameString()).sort();
-    expect(names).toEqual(['dir/', 'dir/empty_subdir/', 'dir/file2.txt', 'file.txt']);
+    assert.deepStrictEqual(names, ['dir/', 'dir/empty_subdir/', 'dir/file2.txt', 'file.txt']);
 });
 
 test("Verify archive", async () => {
-    await expect(verify(archivePath)).resolves.toBe(undefined);
+    assert.strictEqual(await verify(archivePath), undefined);
 });

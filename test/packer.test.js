@@ -1,4 +1,5 @@
-import {afterEach, beforeEach, expect, test} from "@jest/globals";
+import {afterEach, beforeEach, test} from "node:test";
+import assert from "node:assert/strict";
 import * as os from "node:os";
 import fs from "node:fs";
 import * as pathModule from "node:path";
@@ -35,9 +36,9 @@ test("Pack directory", async () => {
     await archive.init();
 
     let entries = await archive.getAllEntries();
-    expect(entries.length).toBe(4);
+    assert.strictEqual(entries.length, 4);
     let names = entries.map(e => e.getFileNameString()).sort();
-    expect(names).toEqual(['dir/', 'dir/empty_subdir/', 'dir/file2.txt', 'file.txt']);
+    assert.deepStrictEqual(names, ['dir/', 'dir/empty_subdir/', 'dir/file2.txt', 'file.txt']);
 });
 
 test("Pack directory to ReadbaleStream", async () => {
@@ -55,9 +56,9 @@ test("Pack directory to ReadbaleStream", async () => {
     await archive.init();
 
     let entries = await archive.getAllEntries();
-    expect(entries.length).toBe(4);
+    assert.strictEqual(entries.length, 4);
     let names = entries.map(e => e.getFileNameString()).sort();
-    expect(names).toEqual(['dir/', 'dir/empty_subdir/', 'dir/file2.txt', 'file.txt']);
+    assert.deepStrictEqual(names, ['dir/', 'dir/empty_subdir/', 'dir/file2.txt', 'file.txt']);
 });
 
 test("Decode special characters in entry names", async () => {
@@ -80,7 +81,7 @@ test("Decode special characters in entry names", async () => {
 
     let entries = await archive.getAllEntries();
     let names = entries.map(e => e.getFileNameString()).sort();
-    expect(names).toEqual([
+    assert.deepStrictEqual(names, [
         '100% done.txt',
         'my folder & stuff/',
         'my folder & stuff/file #1.txt',
@@ -99,8 +100,8 @@ test("Dispose of all file handles and IO contexts", async () => {
     await outputIO[symbols.asyncDispose]();
     await dir[symbols.asyncDispose]();
 
-    expect(tracking.allHandles.size).toBe(0);
-    expect(tracking.allIOs.size).toBe(0);
+    assert.strictEqual(tracking.allHandles.size, 0);
+    assert.strictEqual(tracking.allIOs.size, 0);
 });
 
 test("Dispose entry generators", async () => {
@@ -115,6 +116,6 @@ test("Dispose entry generators", async () => {
     await generator[symbols.asyncDispose]();
     await dir[symbols.asyncDispose]();
 
-    expect(tracking.allHandles.size).toBe(0);
-    expect(tracking.allIOs.size).toBe(0);
+    assert.strictEqual(tracking.allHandles.size, 0);
+    assert.strictEqual(tracking.allIOs.size, 0);
 });

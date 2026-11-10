@@ -1,3 +1,5 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
 import CP437 from '../src/Util/CP437.js';
 
 const validText = 'abcABC123!"§$%&/()=?,.-_:;#+*äöüÄÖÜß';
@@ -11,26 +13,26 @@ const validBytes = new Uint8Array([
     ]);
 
 test('CP437 encode valid string', () => {
-    expect(CP437.encode(validText)).toEqual(validBytes);
+    assert.deepStrictEqual(CP437.encode(validText), validBytes);
 });
 
 test('CP437 encode invalid string', () => {
-    expect(() => CP437.encode(invalidText)).toThrow();
+    assert.throws(() => CP437.encode(invalidText));
 });
 
 test('CP437 decode valid array', () => {
-    expect(CP437.decode(validBytes)).toBe(validText);
+    assert.strictEqual(CP437.decode(validBytes), validText);
 });
 
 test('CP437 decode invalid array', () => {
     // noinspection JSCheckFunctionSignatures
-    expect(() => CP437.decode([1, 2, 3, 4, 5, 257])).toThrow();
+    assert.throws(() => CP437.decode([1, 2, 3, 4, 5, 257]));
 });
 
 test('CP437 can detect valid string', () => {
-    expect(CP437.canBeEncoded(validText)).toBe(true);
+    assert.strictEqual(CP437.canBeEncoded(validText), true);
 });
 
 test('CP437 can detect invalid string', () => {
-    expect(CP437.canBeEncoded(invalidText)).toBe(false);
+    assert.strictEqual(CP437.canBeEncoded(invalidText), false);
 });

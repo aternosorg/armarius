@@ -43,7 +43,7 @@ export default class WriteArchive {
      */
     async *generateEntriesFromFunction(fn) {
         let entry;
-        while (entry = await fn()) {
+        while ((entry = await fn())) {
             yield entry;
         }
     }
@@ -82,7 +82,7 @@ export default class WriteArchive {
      */
     async *getData(readSize = Constants.DEFAULT_CHUNK_SIZE) {
         let chunk;
-        while (chunk = await this.getNextChunk(readSize)) {
+        while ((chunk = await this.getNextChunk(readSize))) {
             yield chunk;
         }
     }
@@ -299,7 +299,7 @@ export default class WriteArchive {
      */
     async writeTo(io, abortSignal = null) {
         let chunk;
-        while (chunk = await this.getNextChunk()) {
+        while ((chunk = await this.getNextChunk())) {
             await io.write(chunk);
             abortSignal?.throwIfAborted();
         }

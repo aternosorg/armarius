@@ -6,7 +6,8 @@ import {
     ReadArchive,
     WriteArchive
 } from '../index.js';
-import {expect, test} from '@jest/globals';
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
 import {FakeDataIO, openFileReader, writeArchive, writeArchiveToBuffer} from './util.js';
 import {BigInt, CRC32, ArrayBufferIO, NodeDeflateDataProcessor, NodeInflateDataProcessor} from "armarius-io";
 
@@ -17,7 +18,6 @@ const timestampSeconds = Math.floor(timestamp/1000);
 const date = new Date(timestamp);
 
 test('Write large file archive', async () => {
-    expect(1).toBe(1);
     let size = 1024*1024*1024*4+1;
     let fileName = 'file.txt';
     let i = 0;
@@ -36,14 +36,14 @@ test('Write large file archive', async () => {
     await readArchive.init();
     let entries = await readArchive.getAllEntries();
 
-    expect(archive.zip64).toBe(true);
-    expect(entries.length).toBe(1);
+    assert.strictEqual(archive.zip64, true);
+    assert.strictEqual(entries.length, 1);
 
     let entry = entries.pop();
-    expect(entry.getFileNameString()).toBe(fileName);
-    expect(entry.zip64ExtendedInformation).toBeTruthy();
-    expect(entry.getUncompressedSize()).toBe(BigInt(size));
-    expect(entry.getCrc()).toBe(126491095);
+    assert.strictEqual(entry.getFileNameString(), fileName);
+    assert.ok(entry.zip64ExtendedInformation);
+    assert.strictEqual(entry.getUncompressedSize(), BigInt(size));
+    assert.strictEqual(entry.getCrc(), 126491095);
 });
 
 test('Write and read archive using NodeJS data processors', async () => {
@@ -80,12 +80,12 @@ test('Write and read archive using NodeJS data processors', async () => {
     await readArchive.init();
     let entries = await readArchive.getAllEntries();
 
-    expect(entries.length).toBe(1);
+    assert.strictEqual(entries.length, 1);
 
     let entry = entries.pop();
-    expect(entry.getFileNameString()).toBe(fileName);
-    expect(decoder.decode(await entry.getData())).toBe(payloadString);
-    expect(entry.getCrc()).toBe(CRC32.hash(payload));
+    assert.strictEqual(entry.getFileNameString(), fileName);
+    assert.strictEqual(decoder.decode(await entry.getData()), payloadString);
+    assert.strictEqual(entry.getCrc(), CRC32.hash(payload));
 });
 
 test('Extra fields', async () => {
@@ -115,32 +115,32 @@ test('Extra fields', async () => {
     await readArchive.init();
     let entries = await readArchive.getAllEntries();
 
-    expect(entries.length).toBe(1);
-    expect(readArchive.isZip64).toBe(true);
+    assert.strictEqual(entries.length, 1);
+    assert.strictEqual(readArchive.isZip64, true);
 
     let entry = entries.pop();
-    expect(entry.getFileNameString()).toBe(fileName);
-    expect(entry.getFileCommentString()).toBe(fileComment);
-    expect(entry.zip64ExtendedInformation).toBeTruthy();
-    expect(entry.extendedTimestamp).toBeTruthy();
-    expect(entry.unicodeFileComment).toBeTruthy();
-    expect(entry.unicodeFileName).toBeTruthy();
-    expect(entry.unicodeFileName?.crc32).toBe(entry.getFileNameCrc());
-    expect(entry.unicodeFileComment?.crc32).toBe(entry.getFileCommentCrc());
-    expect(entry.getLastModDate()).toEqual(date);
+    assert.strictEqual(entry.getFileNameString(), fileName);
+    assert.strictEqual(entry.getFileCommentString(), fileComment);
+    assert.ok(entry.zip64ExtendedInformation);
+    assert.ok(entry.extendedTimestamp);
+    assert.ok(entry.unicodeFileComment);
+    assert.ok(entry.unicodeFileName);
+    assert.strictEqual(entry.unicodeFileName?.crc32, entry.getFileNameCrc());
+    assert.strictEqual(entry.unicodeFileComment?.crc32, entry.getFileCommentCrc());
+    assert.deepStrictEqual(entry.getLastModDate(), date);
 
     let centralTimestampField = entry.extendedTimestamp;
-    expect(centralTimestampField.modTime).toEqual(timestampSeconds);
-    expect(centralTimestampField.acTime).toBeUndefined();
-    expect(centralTimestampField.crTime).toBeUndefined();
+    assert.strictEqual(centralTimestampField.modTime, timestampSeconds);
+    assert.strictEqual(centralTimestampField.acTime, undefined);
+    assert.strictEqual(centralTimestampField.crTime, undefined);
 
     await entry.readLocalFileHeader();
     /** @type {ExtendedTimestamp} */
     let localTimestampField = entry.localFileHeader.getExtraField(Constants.EXTRAFIELD_TYPE_EXTENDED_TIMESTAMP);
-    expect(localTimestampField).toBeInstanceOf(ExtendedTimestamp);
-    expect(localTimestampField.modTime).toEqual(timestampSeconds);
-    expect(localTimestampField.acTime).toEqual(timestampSeconds);
-    expect(localTimestampField.crTime).toEqual(timestampSeconds);
+    assert.ok(localTimestampField instanceof ExtendedTimestamp);
+    assert.strictEqual(localTimestampField.modTime, timestampSeconds);
+    assert.strictEqual(localTimestampField.acTime, timestampSeconds);
+    assert.strictEqual(localTimestampField.crTime, timestampSeconds);
 });
 
 test('Merge archives', async () => {
@@ -174,8 +174,8 @@ test('Merge archives', async () => {
     await archive.init();
     let entries = await archive.getAllEntries();
 
-    expect(entries.find(e => e.fileNameString === 'file1.txt')).toBeInstanceOf(ArchiveEntry);
-    expect(entries.find(e => e.fileNameString === 'file2.txt')).toBeInstanceOf(ArchiveEntry);
+    assert.ok(entries.find(e => e.fileNameString === 'file1.txt') instanceof ArchiveEntry);
+    assert.ok(entries.find(e => e.fileNameString === 'file2.txt') instanceof ArchiveEntry);
 });
 
 test('Clone entry iterator', async () => {
@@ -197,10 +197,10 @@ test('Clone entry iterator', async () => {
     await readArchive.init();
 
     let entryIterator = await readArchive.getEntryIterator();
-    expect((await entryIterator.next()).getFileNameString()).toBe('file-1.txt');
+    assert.strictEqual((await entryIterator.next()).getFileNameString(), 'file-1.txt');
 
     let clone = await entryIterator.clone();
-    expect((await entryIterator.next()).getFileNameString()).toBe((await clone.next()).getFileNameString());
+    assert.strictEqual((await entryIterator.next()).getFileNameString(), (await clone.next()).getFileNameString());
 });
 
 test('Empty directories', async () => {
@@ -217,8 +217,8 @@ test('Empty directories', async () => {
     await readArchive.init();
 
     let entries = await readArchive.getAllEntries();
-    expect(entries.length).toBe(10);
+    assert.strictEqual(entries.length, 10);
     let entry = entries.shift();
-    expect(entry.getFileNameString()).toBe('dir-0/');
-    expect(entry.isDirectory()).toBe(true);
+    assert.strictEqual(entry.getFileNameString(), 'dir-0/');
+    assert.strictEqual(entry.isDirectory(), true);
 });

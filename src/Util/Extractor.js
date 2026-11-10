@@ -27,7 +27,7 @@ export default class Extractor {
      */
     async extractEntries(entryIterator, outputDirectory, signal, archiveBasePath = "") {
         let entry;
-        while (entry = await entryIterator.next()) {
+        while ((entry = await entryIterator.next())) {
             signal.throwIfAborted();
             let filename = entry.getFileNameString();
             if (archiveBasePath.length && (!filename.startsWith(archiveBasePath) || filename === archiveBasePath)) {
@@ -58,7 +58,7 @@ export default class Extractor {
             let outputFile = await baseDir.getChild(basename);
             let writer;
             try {
-                writer = await outputFile.open(false, true)
+                writer = await outputFile.open(false, true);
             } catch (e) {
                 outputFile[symbols.asyncDispose]();
                 if (dispose) {
@@ -71,7 +71,7 @@ export default class Extractor {
                 signal.throwIfAborted();
                 let dataReader = await entry.getDataReader();
                 let chunk;
-                while (chunk = await dataReader.read(DEFAULT_CHUNK_SIZE)) {
+                while ((chunk = await dataReader.read(DEFAULT_CHUNK_SIZE))) {
                     signal.throwIfAborted();
                     await writer.write(chunk);
                 }

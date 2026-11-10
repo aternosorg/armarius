@@ -1,7 +1,6 @@
 import js from '@eslint/js';
 import globals from 'globals';
 import jsdoc from 'eslint-plugin-jsdoc';
-import jest from 'eslint-plugin-jest';
 
 export default [
     js.configs.recommended,
@@ -16,8 +15,7 @@ export default [
             }
         },
         plugins: {
-            jsdoc,
-            jest
+            jsdoc
         },
         rules: {
             'no-empty': [
@@ -43,14 +41,6 @@ export default [
                 'error',
                 'always'
             ]
-        }
-    },
-    {
-        files: ['test/**'],
-        languageOptions: {
-            globals: {
-                ...jest.environments.globals.globals
-            }
         }
     }
 ];

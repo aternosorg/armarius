@@ -28,7 +28,7 @@ export default class Verifier {
      */
     async verifyEntries(entryIterator, signal) {
         let entry;
-        while (entry = await entryIterator.next()) {
+        while ((entry = await entryIterator.next())) {
             signal.throwIfAborted();
             if (this.filter && !await this.filter(entry)) {
                 continue;
